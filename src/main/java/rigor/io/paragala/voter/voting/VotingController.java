@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,8 +37,15 @@ public class VotingController {
         return voter.isPresent()
                 ? canVote(vote)
                 ? registerVote(vote)
-                : new ResponseEntity<>("", HttpStatus.UNAUTHORIZED)
-                : new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+                : new ResponseEntity<>(getError("401", "Voter no longer allowed to vote"), HttpStatus.UNAUTHORIZED)
+                : new ResponseEntity<>(getError("401", "Voter not found"), HttpStatus.UNAUTHORIZED);
+    }
+
+    public Map<String, String> getError(String status, String message) {
+        Map<String, String> map = new HashMap<>();
+        map.put("status", status);
+        map.put("message", message);
+        return map;
     }
 
     private boolean canVote(Map<String, Object> vote) {
@@ -69,7 +77,10 @@ public class VotingController {
         nominees.forEach(System.out::println);
         voteForm.setNominees(nominees);
         voteBox.vote(voteForm);
-        return new ResponseEntity<>("what evil", HttpStatus.OK);
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "200");
+        response.put("message", "Vote Confirmed");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
