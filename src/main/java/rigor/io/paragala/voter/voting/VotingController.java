@@ -1,4 +1,4 @@
-package rigor.io.login.voting;
+package rigor.io.paragala.voter.voting;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

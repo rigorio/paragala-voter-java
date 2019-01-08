@@ -1,13 +1,13 @@
-package rigor.io.login;
+package rigor.io.paragala.voter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LoginApplication {
+public class VoterApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LoginApplication.class, args);
+		SpringApplication.run(VoterApplication.class, args);
 	}
 
 }

@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>rigor.io</groupId>
-	<artifactId>login</artifactId>
+	<artifactId>paragala-voter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>login</name>
+	<name>Paragala Voter</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
