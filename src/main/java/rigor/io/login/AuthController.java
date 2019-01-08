@@ -18,11 +18,9 @@ public class AuthController {
 
     @GetMapping("/private")
     public ResponseEntity<?> privateEndpoint(@RequestParam(required = false, value = "token") String token) {
-        boolean valid = tokenService.isValid(token);
-        if (valid) {
-            return new ResponseEntity<>("I'm a private endpoint", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        return tokenService.isValid(token)
+                ? new ResponseEntity<>("I'm a private endpoint", HttpStatus.OK)
+                : new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/login")
