@@ -16,6 +16,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api")
+// TODO add privilege and token check
 public class VotingController {
 
   private Admin admin;
