@@ -2,13 +2,13 @@ package rigor.io.paragala.voter.register;
 
 public class Registrant {
 
-    private ApplicantRepository applicantRepository;
+  private RegistrationFormRepository registrationFormRepository;
 
-    public Registrant(ApplicantRepository applicantRepository) {
-        this.applicantRepository = applicantRepository;
-    }
+  public Registrant(RegistrationFormRepository registrationFormRepository) {
+    this.registrationFormRepository = registrationFormRepository;
+  }
 
-    public void register(Applicant applicant) {
-
-    }
+  public void register(RegistrationForm registrationForm) {
+    registrationFormRepository.save(registrationForm);
+  }
 }

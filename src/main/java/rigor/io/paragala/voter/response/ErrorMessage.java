@@ -1,4 +1,4 @@
-package rigor.io.paragala.voter.models;
+package rigor.io.paragala.voter.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

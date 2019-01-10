@@ -3,21 +3,28 @@ package rigor.io.paragala.voter.voting;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Service
 public class Admin {
 
-    public Optional<Voter> validateVoter(String uniqueId,
-                                  String voterCode,
-                                  String school) {
-        return Optional.of(
-                new Voter(
-                        "Rigo Sarmiento",
-                        uniqueId,
-                        voterCode,
-                        school,
-                        true
-                ));
-    }
+  private VoterRepository voterRepository;
+
+  public Admin(VoterRepository voterRepository) {
+    this.voterRepository = voterRepository;
+  }
+
+  public Optional<Voter> validateVoter(String uniqueId,
+                                       String voterCode,
+                                       String school) {
+    return voterRepository.findAll()
+        .stream()
+        .parallel()
+        .filter(voter -> voter.getUniqueId().equals(uniqueId)
+            && voter.getVoterCode().equals(voterCode)
+            && voter.getSchool().equals(school))
+        .findAny();
+  }
 
 }
