@@ -2,7 +2,6 @@ package rigor.io.paragala.voter.token;
 
 import rigor.io.paragala.voter.register.RegistrationForm;
 import rigor.io.paragala.voter.register.RegistrationFormRepository;
-import rigor.io.paragala.voter.voting.Voter;
 
 import java.util.ArrayList;
 import java.util.List;
