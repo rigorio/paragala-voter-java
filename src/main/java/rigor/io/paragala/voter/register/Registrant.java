@@ -1,5 +1,8 @@
 package rigor.io.paragala.voter.register;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class Registrant {
 
   private RegistrationFormRepository registrationFormRepository;
