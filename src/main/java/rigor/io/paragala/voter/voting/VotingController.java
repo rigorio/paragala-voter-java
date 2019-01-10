@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rigor.io.paragala.voter.token.Admin;
+import rigor.io.paragala.voter.user.Admin;
 
 import java.io.IOException;
 import java.util.HashMap;

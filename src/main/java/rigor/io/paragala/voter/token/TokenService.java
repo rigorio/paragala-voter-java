@@ -1,13 +1,15 @@
 package rigor.io.paragala.voter.token;
 
+import rigor.io.paragala.voter.user.User;
+
 public interface TokenService {
 
-  String createToken(Admin admin);
+  String createToken(User admin);
 
   void delete(String token);
 
   boolean isValid(String token);
 
-  Admin fetchAdmin(String token);
+  User fetchUser(String token);
 
 }

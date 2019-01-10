@@ -1,6 +1,7 @@
 package rigor.io.paragala.voter.token;
 
 import org.springframework.stereotype.Service;
+import rigor.io.paragala.voter.user.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +10,12 @@ import java.util.UUID;
 @Service
 public class UUIDTokenService implements TokenService {
 
-  private Map<String, Admin> tokens = new HashMap<>();
+  private Map<String, User> tokens = new HashMap<>();
 
   @Override
-  public String createToken(Admin admin) {
+  public String createToken(User user) {
     String token = UUID.randomUUID().toString();
-    tokens.put(token, admin);
+    tokens.put(token, user);
     return token;
   }
 
@@ -29,7 +30,7 @@ public class UUIDTokenService implements TokenService {
   }
 
   @Override
-  public Admin fetchAdmin(String token) {
+  public User fetchUser(String token) {
     return tokens.get(token);
   }
 }
