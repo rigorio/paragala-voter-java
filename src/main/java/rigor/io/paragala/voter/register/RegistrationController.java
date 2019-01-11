@@ -3,6 +3,7 @@ package rigor.io.paragala.voter.register;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.user.Admin;
 
@@ -38,15 +39,8 @@ public class RegistrationController {
     return tokenService.isValid(token)
         ? admin.hasPrivileges(tokenService.fetchUser(token), new String[]{"registrations"})
         ? new ResponseEntity<>(admin.viewRegistrants(), HttpStatus.OK)
-        : defaultUnauthorizedResponse()
-        : defaultUnauthorizedResponse();
-  }
-
-  private ResponseEntity<?> defaultUnauthorizedResponse() {
-    Map<String, String> unauthorizedResponse = new HashMap<>();
-    unauthorizedResponse.put("status", "Unauthorized");
-    unauthorizedResponse.put("message", "You do not have the correct privileges to access this feature");
-    return new ResponseEntity<>(unauthorizedResponse, HttpStatus.UNAUTHORIZED);
+        : ResponseHub.defaultUnauthorizedResponse()
+        : ResponseHub.defaultUnauthorizedResponse();
   }
 
 }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rigor.io.paragala.voter.ResponseHub;
+import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.user.Admin;
 
 import java.io.IOException;
@@ -21,10 +23,12 @@ public class VotingController {
 
   private Admin admin;
   private VoteBox voteBox;
+  private TokenService tokenService;
 
-  public VotingController(Admin admin, VoteBox voteBox) {
+  public VotingController(Admin admin, VoteBox voteBox, TokenService tokenService) {
     this.admin = admin;
     this.voteBox = voteBox;
+    this.tokenService = tokenService;
   }
 
   @PostMapping("/vote")
@@ -45,8 +49,10 @@ public class VotingController {
 
   //will require token
   @GetMapping("/votes")
-  public ResponseEntity<?> viewVotes() {
-    return new ResponseEntity<>(voteBox.viewVotes(), HttpStatus.OK);
+  public ResponseEntity<?> viewVotes(@RequestParam String token) {
+    return tokenService.isValid(token)
+        ? new ResponseEntity<>(voteBox.viewVotes(), HttpStatus.OK)
+        : ResponseHub.defaultUnauthorizedResponse();
   }
 
   private Map<String, String> getError(String status, String message) {
@@ -58,7 +64,7 @@ public class VotingController {
 
   private boolean canVote(Map<String, Object> vote) {
     Optional<Voter> voter = (Optional) vote.get("voter");
-    boolean b = voter.isPresent();
+    boolean b = voter.get().isStatus();
     if (b) {
       System.out.println("hatdog?");
       vote.put("name", voter.get().getName());
@@ -76,7 +82,8 @@ public class VotingController {
         String.valueOf(vote.get("code")),
         String.valueOf(vote.get("school")));
     List<Nominee> nominees = new ObjectMapper().readValue(new ObjectMapper().writeValueAsString(vote.get("votes")),
-                                                          new TypeReference<List<Nominee>>() {});
+        new TypeReference<List<Nominee>>() {
+        });
     nominees.forEach(System.out::println);
     voteForm.setNominees(nominees);
     voteBox.vote(voteForm);
