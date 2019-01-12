@@ -2,8 +2,8 @@ package rigor.io.paragala.voter.verification;
 
 import org.springframework.stereotype.Service;
 import rigor.io.paragala.voter.registration.Registrant;
-import rigor.io.paragala.voter.students.Student;
-import rigor.io.paragala.voter.students.StudentRepository;
+import rigor.io.paragala.voter.provider.Student;
+import rigor.io.paragala.voter.provider.StudentRepository;
 
 import java.util.Optional;
 
@@ -27,8 +27,9 @@ public class RegistrantVerifier {
 
   }
 
-  public void confirmRegistration(Registrant registrant) {
-    Student student = studentRepository.findByUniqueIdAndSchool(registrant.getUniqueId(), registrant.getSchool()).get();
+  public void confirmRegistration(String token) {
+    // get data from generated base64 token
+    // Student student = studentRepository.findByUniqueIdAndSchool(registrant.getUniqueId(), registrant.getSchool()).get();
     // create voter
   }
 

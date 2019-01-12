@@ -1,4 +1,4 @@
-package rigor.io.paragala.voter.students;
+package rigor.io.paragala.voter.provider;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

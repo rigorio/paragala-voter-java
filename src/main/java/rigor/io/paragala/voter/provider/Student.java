@@ -1,4 +1,4 @@
-package rigor.io.paragala.voter.students;
+package rigor.io.paragala.voter.provider;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
