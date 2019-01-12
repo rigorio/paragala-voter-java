@@ -21,9 +21,6 @@ public class VoteForm {
   private String voterCode;
   private String school;
 
-  @OneToMany(targetEntity = Nominee.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  private List<Nominee> nominees;
-
   public VoteForm() {
   }
 

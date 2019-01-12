@@ -10,10 +10,8 @@ import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.user.Admin;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -24,11 +22,13 @@ public class VotingController {
   private Admin admin;
   private VoteBox voteBox;
   private TokenService tokenService;
+  private NomineeRepository nomineeRepository;
 
-  public VotingController(Admin admin, VoteBox voteBox, TokenService tokenService) {
+  public VotingController(Admin admin, VoteBox voteBox, TokenService tokenService, NomineeRepository nomineeRepository) {
     this.admin = admin;
     this.voteBox = voteBox;
     this.tokenService = tokenService;
+    this.nomineeRepository = nomineeRepository;
   }
 
   @PostMapping("/vote")
@@ -73,24 +73,61 @@ public class VotingController {
     return b;
   }
 
+  /**
+   * if student exists show prompt
+   */
   private ResponseEntity<?> registerVote(Map<String, Object> vote) throws IOException {
     System.out.println(vote);
-
     VoteForm voteForm = new VoteForm(
         String.valueOf(vote.get("name")),
         String.valueOf(vote.get("id")),
         String.valueOf(vote.get("code")),
         String.valueOf(vote.get("school")));
     List<Nominee> nominees = new ObjectMapper().readValue(new ObjectMapper().writeValueAsString(vote.get("votes")),
-        new TypeReference<List<Nominee>>() {
-        });
+                                                          new TypeReference<List<Nominee>>() {
+                                                          });
+    List<Map> votes = (List) vote.get("votes");
+    for (Map boto : votes) {
+      String category = String.valueOf(boto.get("category"));
+      String title = String.valueOf(boto.get("title"));
+      String company = String.valueOf(boto.get("company"));
+      nominees.add(
+          Nominee.builder()
+              .category(category)
+              .company(company)
+              .title(title)
+              .votes(getVotes(vote, title, category))
+              .build()
+      );
+    }
+
+    // change everything below this
     nominees.forEach(System.out::println);
-    voteForm.setNominees(nominees);
     voteBox.vote(voteForm);
     Map<String, String> response = new HashMap<>();
     response.put("status", "200");
     response.put("message", "Vote Confirmed");
     return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  private ArrayList<VoteForm> getVotes(Map<String, Object> vote, String title, String category) {
+    List<Nominee> nominees = nomineeRepository.findAll();
+    Optional<Nominee> filteredNominees = nominees.stream()
+        .filter(nominee -> nominee.getCategory().equals(category) &&
+            nominee.getTitle().equals(title))
+        .findAny();
+    VoteForm voteForm = new VoteForm(
+        String.valueOf(vote.get("name")),
+        String.valueOf(vote.get("id")),
+        String.valueOf(vote.get("code")),
+        String.valueOf(vote.get("school")));
+    if (filteredNominees.isPresent()) {
+      Nominee nominee = filteredNominees.get();
+      List<VoteForm> votes = new ArrayList<>(nominee.getVotes());
+      votes.add(voteForm);
+      nominee.setVotes(votes);
+    }
+    return new ArrayList<>(Collections.singletonList(voteForm));
   }
 
 }

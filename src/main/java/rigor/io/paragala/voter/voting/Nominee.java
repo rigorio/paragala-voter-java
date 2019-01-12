@@ -1,14 +1,14 @@
 package rigor.io.paragala.voter.voting;
 
+import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
+@Builder
 public class Nominee {
 
   @Id
@@ -17,6 +17,8 @@ public class Nominee {
   private String title;
   private String company;
   private String category;
+  @OneToMany(targetEntity = VoteForm.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  private List<VoteForm> votes;
 
   public Nominee() {
   }
