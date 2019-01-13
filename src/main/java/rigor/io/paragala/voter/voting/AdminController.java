@@ -26,7 +26,7 @@ public class AdminController {
     this.nomineeRepository = nomineeRepository;
   }
 
-  @GetMapping("/votes")
+  @GetMapping("/votes/v1")
   public ResponseEntity<?> viewVotes(@RequestParam String token) {
     boolean isValid = tokenService.isValid(token);
 
@@ -34,6 +34,20 @@ public class AdminController {
       return ResponseHub.defaultUnauthorizedResponse();
 
     return new ResponseEntity<>(voteBoxService.getAllVotes(), HttpStatus.OK);
+  }
+
+  @GetMapping("/votes/v2")
+  public ResponseEntity<?> viewFullVotes(@RequestParam String token) {
+    return tokenService.isValid(token)
+        ? new ResponseEntity<>(voteBoxService.getFullNomineeTallies(), HttpStatus.OK)
+        : ResponseHub.defaultUnauthorizedResponse();
+  }
+
+  @GetMapping("/nominees")
+  public ResponseEntity<?> viewNominees(@RequestParam String token) {
+    return tokenService.isValid(token)
+        ? new ResponseEntity<>(nomineeRepository.findAll(), HttpStatus.OK)
+        : ResponseHub.defaultUnauthorizedResponse();
   }
 
   @PostMapping("/nominees")
@@ -64,7 +78,7 @@ public class AdminController {
 
   private String[] titles = new String[]{
       "Public Eye: Klasrum Kalsada PTV 4 Public Affairs", "Philippine Seas by Atom Araullo",
-      "Reel Time: Salat", "\"Di ka Pasisiil by Jeff Canoy and Chiara Zambrano",
+      "Reel Time: Salat", "\'Di ka Pasisiil by Jeff Canoy and Chiara Zambrano",
       "Chiara Zambrano in TV Patrol", "Maricel Halili in Aksyon Tonite",
       "Karol Di in PTV News", "Sandra Aguinaldo in 24 Oras", "Doris Bigornia in TV Patrol",
       "Ina Andolong in Newsroom", "Susan Enriquez in 24 Oras",

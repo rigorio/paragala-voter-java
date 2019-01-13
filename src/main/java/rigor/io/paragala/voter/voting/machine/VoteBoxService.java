@@ -26,6 +26,24 @@ public class VoteBoxService {
   }
 
   public Map<String, Object> getAllVotes() {
+    List<FullNomineeTally> fullNomineeTallies = getFullNomineeTallies();
+
+    Map<String, Object> category = new HashMap<>();
+    for (String c : getCategories()) {
+      Map<String, Object> nominee = new HashMap<>();
+      for (FullNomineeTally fullNomineeTally : fullNomineeTallies) {
+        if (fullNomineeTally.getCategory().equals(c)) {
+          nominee.put("title", fullNomineeTally.getTitle());
+          nominee.put("company", fullNomineeTally.getCompany());
+          nominee.put("tally", fullNomineeTally.getTally());
+        }
+      }
+      category.put(c, nominee);
+    }
+    return category;
+  }
+
+  public List<FullNomineeTally> getFullNomineeTallies() {
     List<VoteForm> voteForms = voteFormRepository.findAll();
     List<Long> nomineeIds = nomineeRepository.findAll().stream()
         .map(Nominee::getId)
@@ -48,20 +66,7 @@ public class VoteBoxService {
                                  .category(nominee.getCategory())
                                  .build());
     }
-
-    Map<String, Object> category = new HashMap<>();
-    for (String c : getCategories()) {
-      Map<String, Object> nominee = new HashMap<>();
-      for (FullNomineeTally fullNomineeTally : fullNomineeTallies) {
-        if (fullNomineeTally.getCategory().equals(c)) {
-          nominee.put("title", fullNomineeTally.getTitle());
-          nominee.put("company", fullNomineeTally.getCompany());
-          nominee.put("tally", fullNomineeTally.getTally());
-        }
-      }
-      category.put(c, nominee);
-    }
-    return category;
+    return fullNomineeTallies;
   }
 
   private List<String> getCategories() {
