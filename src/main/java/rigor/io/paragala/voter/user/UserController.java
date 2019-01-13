@@ -3,6 +3,7 @@ package rigor.io.paragala.voter.user;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import rigor.io.paragala.voter.token.TokenService;
 
@@ -19,8 +20,13 @@ public class UserController {
     this.userRepository = userRepository;
   }
 
+  @PostMapping("/user")
+  public void create(@RequestParam String username, @RequestParam String password) {
+    userRepository.save(new User(username, password));
+  }
+
   @PostMapping("/login")
-  public ResponseEntity<?> login(String username, String password) {
+  public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
     return user.isPresent()
         ? new ResponseEntity<>(tokenService.createToken(user.get()), HttpStatus.OK)
