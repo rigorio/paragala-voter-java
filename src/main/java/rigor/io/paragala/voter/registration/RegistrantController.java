@@ -32,14 +32,19 @@ public class RegistrantController {
       return new ResponseEntity<>(map, HttpStatus.OK);
     }
     map.put("status", "Registration Failed");
-    map.put("message", "Student has not been verified by administration");
+    map.put("message", "Voter has not been verified by administration");
     return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
   }
 
   @PostMapping("/confirmation")
-  public ResponseEntity<?> confirmRegistration(@RequestParam String token) {
-    registrantVerifier.confirmRegistration(token);
+  public ResponseEntity<?> confirmRegistration(@RequestParam String code) {
+    boolean isConfirmed = registrantVerifier.confirmRegistration(code);
     Map<String, String> map = new HashMap<>();
+    if (!isConfirmed){
+      map.put("status", "Bad request");
+      map.put("message", "There was a problem with your request. Contact your administrator for more details");
+      return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+    }
     map.put("status", "Account successfully created!");
     map.put("message", "Please proceed to vote on the paragala app");
     return new ResponseEntity<>(map, HttpStatus.OK);

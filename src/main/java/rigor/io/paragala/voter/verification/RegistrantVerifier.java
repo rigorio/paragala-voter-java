@@ -2,35 +2,63 @@ package rigor.io.paragala.voter.verification;
 
 import org.springframework.stereotype.Service;
 import rigor.io.paragala.voter.registration.Registrant;
-import rigor.io.paragala.voter.provider.Student;
-import rigor.io.paragala.voter.provider.StudentRepository;
+import rigor.io.paragala.voter.voting.Voter;
+import rigor.io.paragala.voter.voting.VoterRepository;
 
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
 public class RegistrantVerifier {
 
-  private StudentRepository studentRepository;
+  private VoterRepository voterRepository;
 
-  public RegistrantVerifier(StudentRepository studentRepository) {
-    this.studentRepository = studentRepository;
+  public RegistrantVerifier(VoterRepository voterRepository) {
+    this.voterRepository = voterRepository;
   }
 
   public boolean verifyRegistrant(Registrant registrant) {
+    Optional<Voter> voter = getStudent(registrant);
+    return voter.isPresent();
+  }
+
+  // TODO
+  public void sendEmail(Registrant registrant) {
+    String voterCode = generateVoterCode(registrant.getSchool(), registrant.getUniqueId());
+
+    // send email
+  }
+
+  public boolean confirmRegistration(String token) {
+    String decodedString = new String(Base64.getDecoder().decode(token));
+    String[] data = decodedString.split(":");
+    if (data.length!=2)
+      return false;
+    String school = data[0];
+    String uniqueId = data[1];
+    Optional<Voter> v = voterRepository.findByUniqueIdAndSchool(uniqueId, school);
+    if (!v.isPresent())
+      return false;
+    Voter voter = v.get();
+    String voterCode = generateVoterCode(school, uniqueId);
+    voter.allowVoting();
+    voter.setVoterCode(voterCode);
+    voterRepository.save(voter);
+    return true;
+  }
+
+  private Optional<Voter> getStudent(Registrant registrant) {
     String school = registrant.getSchool();
     String uniqueId = registrant.getUniqueId();
-    Optional<Student> student = studentRepository.findByUniqueIdAndSchool(uniqueId, school);
-    return student.isPresent();
+    return voterRepository.findByUniqueIdAndSchool(uniqueId, school);
   }
 
-  public void sendEmail(Registrant registrant) {
-
-  }
-
-  public void confirmRegistration(String token) {
-    // get data from generated base64 token
-    // Student student = studentRepository.findByUniqueIdAndSchool(registrant.getUniqueId(), registrant.getSchool()).get();
-    // create voter
+  private String generateVoterCode(String school, String uniqueId) {
+    return new String(Base64.getEncoder()
+                          .withoutPadding()
+                          .encode(
+                              (school + ":" + uniqueId).getBytes()
+                          ));
   }
 
 }
