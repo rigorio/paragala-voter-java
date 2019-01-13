@@ -2,17 +2,16 @@ package rigor.io.paragala.voter.registration;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.verification.RegistrantVerifier;
 
+import javax.mail.MessagingException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api")
 public class RegistrantController {
 
   private RegistrantVerifier registrantVerifier;
@@ -22,7 +21,7 @@ public class RegistrantController {
   }
 
   @PostMapping("/registration")
-  public ResponseEntity<?> register(@RequestBody Registrant registrant) {
+  public ResponseEntity<?> register(@RequestBody Registrant registrant) throws MessagingException {
     boolean verified = registrantVerifier.verifyRegistrant(registrant);
     Map<String, String> map = new HashMap<>();
     if (verified) {
@@ -36,7 +35,7 @@ public class RegistrantController {
     return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
   }
 
-  @PostMapping("/confirmation")
+  @GetMapping("/confirmation")
   public ResponseEntity<?> confirmRegistration(@RequestParam String code) {
     boolean isConfirmed = registrantVerifier.confirmRegistration(code);
     Map<String, String> map = new HashMap<>();

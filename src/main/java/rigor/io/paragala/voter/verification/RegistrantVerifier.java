@@ -5,6 +5,7 @@ import rigor.io.paragala.voter.registration.Registrant;
 import rigor.io.paragala.voter.voting.Voter;
 import rigor.io.paragala.voter.voting.VoterRepository;
 
+import javax.mail.MessagingException;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -23,10 +24,10 @@ public class RegistrantVerifier {
   }
 
   // TODO
-  public void sendEmail(Registrant registrant) {
+  public void sendEmail(Registrant registrant) throws MessagingException {
     String voterCode = generateVoterCode(registrant.getSchool(), registrant.getUniqueId());
-
-    // send email
+    EmailSender sender = new EmailSender();
+    sender.sendMail(registrant.getEmail(), voterCode);
   }
 
   public boolean confirmRegistration(String token) {
