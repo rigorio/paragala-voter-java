@@ -42,9 +42,9 @@ public class VoterController {
 
   @PostMapping("/voting")
   public ResponseEntity<?> vote(@RequestBody Map<String, Object> data) throws IOException {
-    String school = String.valueOf(data.get("school"));
     String uniqueId = String.valueOf(data.get("id"));
     String voterCode = String.valueOf(data.get("code"));
+    String school = String.valueOf(data.get("school"));
     Optional<Voter> idschool = voterRepository.findByUniqueIdAndSchool(uniqueId, school);
 
     if (!idschool.isPresent())

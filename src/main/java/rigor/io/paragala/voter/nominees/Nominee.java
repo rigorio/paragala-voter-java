@@ -13,12 +13,12 @@ public class Nominee {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  private String name;
-  private String company;
+  private String title;
   private String category;
+  private String company;
 
-  public Nominee(String name, String company, String category) {
-    this.name = name;
+  public Nominee(String title, String company, String category) {
+    this.title = title;
     this.company = company;
     this.category = category;
   }
