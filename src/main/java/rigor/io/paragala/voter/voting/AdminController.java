@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class AdminController {
 
@@ -26,12 +27,12 @@ public class AdminController {
     this.nomineeRepository = nomineeRepository;
   }
 
-  @GetMapping("/votes/v1")
-  public ResponseEntity<?> viewVotes(@RequestParam String token) {
-    boolean isValid = tokenService.isValid(token);
-
-    if (!isValid)
-      return ResponseHub.defaultUnauthorizedResponse();
+  @GetMapping("/data/results")
+  public ResponseEntity<?> viewVotes(@RequestParam(required = false) String token) {
+//      boolean isValid = tokenService.isValid(token);
+//
+//      if (!isValid)
+//        return ResponseHub.defaultUnauthorizedResponse();
 
     return new ResponseEntity<>(voteBoxService.getAllVotes(), HttpStatus.OK);
   }
@@ -43,28 +44,14 @@ public class AdminController {
         : ResponseHub.defaultUnauthorizedResponse();
   }
 
-  @GetMapping("/nominees")
-  public ResponseEntity<?> viewNominees(@RequestParam String token) {
-    return tokenService.isValid(token)
-        ? new ResponseEntity<>(nomineeRepository.findAll(), HttpStatus.OK)
-        : ResponseHub.defaultUnauthorizedResponse();
-  }
 
-  @PostMapping("/nominees")
-  public ResponseEntity<?> addNominees(@RequestParam String token,
-                                       @RequestBody List<Nominee> nominees) {
-    return tokenService.isValid(token)
-        ? new ResponseEntity<>(nomineeRepository.saveAll(nominees), HttpStatus.OK)
-        : ResponseHub.defaultUnauthorizedResponse();
-  }
-
-  @GetMapping("/nominees/default")
-  public ResponseEntity<?> populateNominees(@RequestParam String token) {
+  @GetMapping("/data/defaults/nominees")
+  public ResponseEntity<?> populateNominees(@RequestParam(required = false) String token) {
     nomineeRepository.deleteAll();
     return new ResponseEntity<>(nomineeRepository.saveAll(populate()), HttpStatus.OK);
   }
 
-  private List<Nominee> populate() {
+  public List<Nominee> populate() {
     List<Nominee> nominees = new ArrayList<>();
     for (int i = 0; i < titles.length; i++) {
       nominees.add(new Nominee(

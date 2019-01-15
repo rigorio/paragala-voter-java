@@ -1,8 +1,5 @@
 package rigor.io.paragala.voter.voting.machine;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import org.springframework.stereotype.Service;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
@@ -25,22 +22,23 @@ public class VoteBoxService {
     this.voterRepository = voterRepository;
   }
 
-  public Map<String, Object> getAllVotes() {
+  public List<Map<String, Object>> getAllVotes() {
     List<FullNomineeTally> fullNomineeTallies = getFullNomineeTallies();
 
-    Map<String, Object> category = new HashMap<>();
+    List<Map<String, Object>> finalDecision = new ArrayList<>();
     for (String c : getCategories()) {
-      Map<String, Object> nominee = new HashMap<>();
       for (FullNomineeTally fullNomineeTally : fullNomineeTallies) {
+        Map<String, Object> nominee = new HashMap<>();
         if (fullNomineeTally.getCategory().equals(c)) {
           nominee.put("title", fullNomineeTally.getTitle());
           nominee.put("company", fullNomineeTally.getCompany());
           nominee.put("tally", fullNomineeTally.getTally());
+          nominee.put("category", c);
+          finalDecision.add(nominee);
         }
       }
-      category.put(c, nominee);
     }
-    return category;
+    return finalDecision;
   }
 
   public List<FullNomineeTally> getFullNomineeTallies() {
