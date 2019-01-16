@@ -23,7 +23,7 @@ public class RegistrantVerifier {
     return voter.isPresent();
   }
 
-  // TODO
+  // TODO todo WHAT?!
   public void sendEmail(Registrant registrant) throws MessagingException {
     String voterCode = generateVoterCode(registrant.getSchool(), registrant.getUniqueId());
     EmailSender sender = new EmailSender();

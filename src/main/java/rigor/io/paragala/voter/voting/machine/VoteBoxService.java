@@ -79,8 +79,21 @@ public class VoteBoxService {
 
   public void vote(List<Nominee> nominees, Voter voter) {
     Long voterId = voter.getId();
+    voter.denyVoting();
+    voterRepository.save(voter);
     List<VoteForm> voteForms = new ArrayList<>();
+    List<Nominee> completeNominees = new ArrayList<>();
+    List<Nominee> all = nomineeRepository.findAll();
     for (Nominee nominee : nominees) {
+      completeNominees.add(
+          all.stream().filter(n ->
+                  n.getTitle().equals(nominee.getTitle()) &&
+                  n.getCategory().equals(nominee.getCategory())
+          )
+              .findAny().get()
+      );
+    }
+    for (Nominee nominee : completeNominees) {
       voteForms.add(new VoteForm(voterId, nominee.getId()));
     }
     voteFormRepository.saveAll(voteForms);

@@ -24,7 +24,8 @@ public class EmailSender {
         Message.RecipientType.TO, InternetAddress.parse(email));
     message.setSubject("Paragala voter registration");
     String link = host + "/api/confirmation?code=" + voterCode;
-    String msg = "Please click the link to confirm your registration: " + link;
+    String msg = "Your voter code is: " + voterCode + ". " +
+        "Please click the link to confirm your registration: " + link;
 
     MimeBodyPart mimeBodyPart = new MimeBodyPart();
     mimeBodyPart.setContent(msg, "text/html");

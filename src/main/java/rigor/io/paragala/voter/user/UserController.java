@@ -2,14 +2,14 @@ package rigor.io.paragala.voter.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rigor.io.paragala.voter.token.TokenService;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 public class UserController {
 
   private TokenService tokenService;
@@ -18,6 +18,8 @@ public class UserController {
   public UserController(TokenService tokenService, UserRepository userRepository) {
     this.tokenService = tokenService;
     this.userRepository = userRepository;
+    User defaultUser = this.userRepository.save(new User("paragala.ph", "p4r4g4l4"));
+    System.out.println(defaultUser);
   }
 
   @PostMapping("/user")
@@ -26,7 +28,12 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
+  public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+    if (credentials.get("username")==null && credentials.get("password")==null)
+      return new ResponseEntity<>("is no good papi", HttpStatus.BAD_REQUEST);
+
+    String username = credentials.get("username");
+    String password = credentials.get("password");
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
     return user.isPresent()
         ? new ResponseEntity<>(tokenService.createToken(user.get()), HttpStatus.OK)
@@ -40,9 +47,9 @@ public class UserController {
         : new ResponseEntity<>(" alrady logged out", HttpStatus.NOT_FOUND);
   }
 
-  private ResponseEntity<String> logoutUser(String token) {
+  private String logoutUser(String token) {
     tokenService.delete(token);
-    return new ResponseEntity<>("is logged", HttpStatus.OK);
+    return "is logged out";
   }
 
 }

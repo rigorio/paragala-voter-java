@@ -12,6 +12,7 @@ import rigor.io.paragala.voter.token.TokenService;
 import javax.xml.ws.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,20 @@ public class DataController {
   private SchoolRepository schoolRepository;
   private CategoryRepository categoryRepository;
   private NomineeRepository nomineeRepository;
+
+  private String[] titles = DataProvider.titles;
+  private String[] companies = DataProvider.companies;
+  private String[] categories = DataProvider.categories;
+
+  public DataController(TokenService tokenService,
+                        SchoolRepository schoolRepository,
+                        CategoryRepository categoryRepository,
+                        NomineeRepository nomineeRepository) {
+    this.tokenService = tokenService;
+    this.schoolRepository = schoolRepository;
+    this.categoryRepository = categoryRepository;
+    this.nomineeRepository = nomineeRepository;
+  }
 
   @GetMapping("/schools")
   public ResponseEntity<?> getSchools(@RequestParam(required = false) String token) {
@@ -88,20 +103,47 @@ public class DataController {
   }
 
 
-
   // DEFAULTS
   @GetMapping("/defaults/categories")
   public ResponseEntity<?> defaultCategories(@RequestParam(required = false) String token) {
 
-    List<Category> categories = categoryRepository.findAll();
+//    categoryRepository.deleteAll();
     return new ResponseEntity<>(
-        categories
-            .stream()
-            .map(Category::getCategory)
-            .collect(Collectors.toList())
-            .toArray(new String[categories.size()]),
+        new HashSet<>(Arrays.asList(categories)),
         HttpStatus.OK
     );
   }
+
+  @GetMapping("/defaults/nominees")
+  public ResponseEntity<?> defaultNominees(@RequestParam(required = false) String token) {
+
+    nomineeRepository.deleteAll();
+    return new ResponseEntity<>(nomineeRepository.saveAll(populate()), HttpStatus.OK);
+  }
+
+  @GetMapping("/defaults/schools")
+  public ResponseEntity<?> defaultSchools(@RequestParam(required = false) String token) {
+
+    return new ResponseEntity<>(new HashSet<String>(){{
+      add("Holy Angel University");
+      add("Angeles University Foundation");
+      add("Mabalacat City College");
+      add("Tarlac State Univesity");
+      add("Benguet State University");
+    }}, HttpStatus.OK);
+  }
+
+  private List<Nominee> populate() {
+    List<Nominee> nominees = new ArrayList<>();
+    for (int i = 0; i < titles.length; i++) {
+      nominees.add(new Nominee(
+          titles[i],
+          companies[i],
+          categories[i]
+      ));
+    }
+    return nominees;
+  }
+
 
 }

@@ -4,22 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.voting.machine.VoteBoxService;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
+@CrossOrigin
 public class VoterController {
 
   private VoterRepository voterRepository;
@@ -32,15 +27,36 @@ public class VoterController {
     this.voteBoxService = voteBoxService;
   }
 
+  @GetMapping("/voters")
+  public ResponseEntity<?> getVoters(@RequestParam(required = false) String token) {
+
+
+    return new ResponseEntity<>(voterRepository.findAll(), HttpStatus.OK);
+  }
+
   @PostMapping("/voters")
-  public ResponseEntity<?> addStudents(@RequestParam String token,
+  public ResponseEntity<?> addStudents(@RequestParam(required = false) String token,
                                        @RequestBody List<Voter> voters) {
     return tokenService.isValid(token)
         ? new ResponseEntity<>(voterRepository.saveAll(voters), HttpStatus.OK)
         : ResponseHub.defaultUnauthorizedResponse();
   }
 
-  @PostMapping("/voting")
+  @GetMapping("/defaults/voters")
+  public ResponseEntity<?> defaultVoters(@RequestParam(required = false) String token) {
+    voterRepository.deleteAll();
+    return new ResponseEntity<>(voterRepository.saveAll(
+        new ArrayList<>(Arrays.asList(
+            new Voter("Holy Angel University", "1312312"),
+            new Voter("Angeles University Foundation", "2312312"),
+            new Voter("Mabalacat City College", "3312312"),
+            new Voter("Tarlac State Univesity", "4312312"),
+            new Voter("Benguet State University", "5312312")
+        ))
+    ), HttpStatus.OK);
+  }
+
+  @PostMapping("/vote")
   public ResponseEntity<?> vote(@RequestBody Map<String, Object> data) throws IOException {
     String uniqueId = String.valueOf(data.get("id"));
     String voterCode = String.valueOf(data.get("code"));
@@ -54,23 +70,30 @@ public class VoterController {
       }}, HttpStatus.BAD_REQUEST);
 
     Voter voter = idschool.get();
+
+    if (!voter.isEligible())
+      return new ResponseEntity<>(new HashMap<String, Object>() {{
+        put("status", "Not allowed");
+        put("message", "You are no longer eligible to vote. Please contact your administrator for concerns.");
+      }}, HttpStatus.BAD_REQUEST);
+
     if (!voter.getVoterCode().equals(voterCode))
       return new ResponseEntity<>(new HashMap<String, Object>() {{
         put("status", "Wrong code");
         put("message", "Please use your proper voter code");
       }}, HttpStatus.BAD_REQUEST);
 
-    ObjectMapper mmapper = new ObjectMapper();
+    ObjectMapper mapper = new ObjectMapper();
 
     Object votes = data.get("votes");
 
-    String jsonString = mmapper.writeValueAsString(votes);
-    List<Nominee> nominees = mmapper.readValue(jsonString, new TypeReference<List<Nominee>>() {});
+    String jsonString = mapper.writeValueAsString(votes);
+    List<Nominee> nominees = mapper.readValue(jsonString, new TypeReference<List<Nominee>>() {});
 
     voteBoxService.vote(nominees, voter);
     return new ResponseEntity<>(new HashMap<String, Object>() {{
       put("status", "Success");
-      put("message", "thx nxt");
+      put("message", "Thank you for voting!");
     }}, HttpStatus.BAD_REQUEST);
   }
 

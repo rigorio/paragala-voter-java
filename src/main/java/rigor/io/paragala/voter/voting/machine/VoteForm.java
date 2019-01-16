@@ -1,6 +1,8 @@
 package rigor.io.paragala.voter.voting.machine;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import rigor.io.paragala.voter.nominees.Nominee;
 
 import javax.persistence.Entity;
@@ -11,6 +13,8 @@ import java.util.Set;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class VoteForm {
 
   @Id

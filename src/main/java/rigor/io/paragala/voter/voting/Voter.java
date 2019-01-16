@@ -21,11 +21,17 @@ public class Voter {
   @Setter(AccessLevel.NONE)
   private boolean eligible;
 
-  public Voter(String school, String uniqueId, @Nullable String voterCode, boolean eligible) {
+  public Voter(String school, String uniqueId) {
+    this.school = school;
+    this.uniqueId = uniqueId;
+    allowVoting();
+  }
+
+  public Voter(String school, String uniqueId, @Nullable String voterCode) {
     this.school = school;
     this.uniqueId = uniqueId;
     this.voterCode = voterCode;
-    this.eligible = eligible;
+    allowVoting();
   }
 
   public void allowVoting() {
