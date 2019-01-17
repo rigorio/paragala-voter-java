@@ -1,5 +1,6 @@
 package rigor.io.paragala.voter.details;
 
+import com.google.common.collect.Lists;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/data")
+@SuppressWarnings("all")
 public class DataController {
 
   private TokenService tokenService;
@@ -35,6 +37,39 @@ public class DataController {
     this.nomineeRepository = nomineeRepository;
   }
 
+  /**
+   *
+   */
+  @GetMapping("/schools")
+  public ResponseEntity<?> getSchools(@RequestParam(required = false) String token) {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    List<School> all = schoolRepository.findAll();
+    String[] schools = all
+        .stream()
+        .map(School::getName)
+        .collect(Collectors.toList())
+        .toArray(new String[all.size()]);
+    return ResponseHub.defaultFound(schools);
+  }
+
+  /**
+   *
+   */
+  @PostMapping("/schools")
+  public ResponseEntity<?> addSchools(@RequestParam(required = false) String token,
+                                      @RequestBody String school) {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    School savedSchool = schoolRepository.save(new School(school));
+    return ResponseHub.defaultCreated(savedSchool);
+  }
+
+  /**
+   *
+   */
   @DeleteMapping("/schools/{school}")
   public ResponseEntity<?> deleteSchool(@RequestParam(required = false) String token,
                                         @PathVariable String school) {
@@ -42,36 +77,44 @@ public class DataController {
       return ResponseHub.defaultUnauthorizedResponse();
 
     schoolRepository.deleteByName(school);
-    return new ResponseEntity<>("ok", HttpStatus.ACCEPTED);
+    return ResponseHub.defaultDeleted();
   }
 
-  @GetMapping("/schools")
-  public ResponseEntity<?> getSchools(@RequestParam(required = false) String token) {
+  /**
+   *
+   */
+  @GetMapping("/categories")
+  public ResponseEntity<?> getCategories(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    List<School> schools = schoolRepository.findAll();
-    return new ResponseEntity<>(
-        schools
-            .stream()
-            .map(School::getName)
-            .collect(Collectors.toList())
-            .toArray(new String[schools.size()]),
-        HttpStatus.OK
-    );
+    List<Category> all = categoryRepository.findAll();
+    String[] categories = all
+        .stream()
+        .map(Category::getKategory)
+        .collect(Collectors.toList())
+        .toArray(new String[all.size()]);
+    return ResponseHub.defaultFound(categories);
   }
 
-  @PostMapping("/schools")
-  public ResponseEntity<?> addSchools(@RequestParam(required = false) String token,
-                                      @RequestBody String[] schools) {
+  /**
+   *
+   */
+  @PostMapping("/categories")
+  public ResponseEntity<?> addCategories(@RequestParam(required = false) String token,
+                                         @RequestBody String[] categories) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    schoolRepository.deleteAll();
-    List<School> schoolList = Arrays.stream(schools).map(School::new).collect(Collectors.toList());
-    return new ResponseEntity<>(schoolRepository.saveAll(schoolList), HttpStatus.OK);
+    List<Category> categoryList = Arrays.stream(categories).map(Category::new).collect(Collectors.toList());
+    Iterable<Category> iterable = categoryRepository.saveAll(categoryList);
+    List<Category> createdCategories = Lists.newArrayList(iterable);
+    return ResponseHub.defaultCreated(createdCategories);
   }
 
+  /**
+   *
+   */
   @DeleteMapping("/categories/{category}")
   public ResponseEntity<?> deleteCategory(@RequestParam(required = false) String token,
                                           @PathVariable String category) {
@@ -79,69 +122,54 @@ public class DataController {
       return ResponseHub.defaultUnauthorizedResponse();
 
     categoryRepository.deleteByKategory(category);
-    return new ResponseEntity<>("eh e heh", HttpStatus.ACCEPTED);
+    return ResponseHub.defaultDeleted();
   }
 
-  @GetMapping("/categories")
-  public ResponseEntity<?> getCategories(@RequestParam(required = false) String token) {
-    if (!tokenService.isValid(token))
-      return ResponseHub.defaultUnauthorizedResponse();
-
-    List<Category> categories = categoryRepository.findAll();
-    return new ResponseEntity<>(
-        categories
-            .stream()
-            .map(Category::getKategory)
-            .collect(Collectors.toList())
-            .toArray(new String[categories.size()]),
-        HttpStatus.OK
-    );
-  }
-
-  @PostMapping("/categories")
-  public ResponseEntity<?> addCategories(@RequestParam(required = false) String token,
-                                         @RequestBody String[] categories) {
-    if (!tokenService.isValid(token))
-      return ResponseHub.defaultUnauthorizedResponse();
-
-    categoryRepository.deleteAll();
-    List<Category> categoryList = Arrays.stream(categories).map(Category::new).collect(Collectors.toList());
-    Iterable<Category> extractedBecauseMeNoLikeSeeingYellowLines = categoryRepository.saveAll(categoryList);
-    return new ResponseEntity<>(extractedBecauseMeNoLikeSeeingYellowLines, HttpStatus.OK);
-  }
-
+  /**
+   *
+   */
   @GetMapping("/nominees")
   public ResponseEntity<?> getNominees(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    return new ResponseEntity<>(nomineeRepository.findAll(), HttpStatus.OK);
+    List<Nominee> nominees = nomineeRepository.findAll();
+    return ResponseHub.defaultFound(nominees);
   }
 
+
+
+  /**
+   * TODO add filter for existing nominees
+   */
   @PostMapping("/nominees")
   public ResponseEntity<?> addNominees(@RequestParam(required = false) String token,
                                        @RequestBody List<Nominee> nominees) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    nomineeRepository.deleteAll();
-    return new ResponseEntity<>(nomineeRepository.saveAll(nominees), HttpStatus.OK);
+    List<Nominee> createdNominees = nomineeRepository.saveAll(nominees);
+    return ResponseHub.defaultCreated(createdNominees);
   }
 
-  @DeleteMapping("/nominees")
+  /**
+   * Http DELETE does not accept body
+   * TODO check if id can also be retrieved, delete by id instead
+   */
+  @PostMapping("/delete/nominees")
   public ResponseEntity<?> deleteNominee(@RequestParam(required = false) String token,
                                          @RequestBody Map<String, String> data) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
     String title = data.get("title");
-    String category = data.get("kategory");
+    String category = data.get("category");
     nomineeRepository.deleteByTitleAndCategory(title, category);
-    return new ResponseEntity<>("ayye", HttpStatus.ACCEPTED);
+    return ResponseHub.defaultDeleted();
   }
 
 
-  // DEFAULTS
+  // TODO! DEFAULTS: DO NOT USE !!
   @GetMapping("/defaults/categories")
   public ResponseEntity<?> defaultCategories(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))

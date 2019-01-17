@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.token.TokenService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
   private TokenService tokenService;
@@ -23,24 +24,41 @@ public class UserController {
     this.userRepository.save(new User("paragala.ph", "p4r4g4l4"));
   }
 
-  @PostMapping("/user")
-  public void create(@RequestParam String username, @RequestParam String password) {
-    userRepository.save(new User(username, password));
+  /**
+   *
+   */
+  @PostMapping("/paragala")
+  public ResponseEntity<?> create(@RequestParam(required = false) String username, @RequestParam String password) {
+    User user = userRepository.save(new User(username, password));
+    return ResponseHub.defaultCreated(user);
   }
 
-  @DeleteMapping("/users/{user}")
+  /**
+   *
+   */
+  @PostMapping("/delete/{user}")
   public ResponseEntity<?> deleteUser(@RequestParam(required = false) String token,
-                                      @PathVariable String user) {
+                                      @PathVariable String user,
+                                      @RequestBody String password) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
+
+    User u = tokenService.fetchUser(token);
+    Optional<User> attemptingUser = userRepository.findByUsernameAndPassword(u.getUsername(), password);
+
+    if (!attemptingUser.isPresent())
+      return ResponseHub.defaultWrongPassword();
+
     userRepository.deleteByUsername(user);
-    return new ResponseEntity<>("deleted", HttpStatus.ACCEPTED);
+    return ResponseHub.defaultDeleted();
   }
 
-  @PostMapping("/users")
+  /**
+   *
+   */
+  @PostMapping("")
   public ResponseEntity<?> create(@RequestParam(required = false) String token,
                                   @RequestBody Map<String, String> data) {
-
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
@@ -50,40 +68,58 @@ public class UserController {
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
 
     if (!user.isPresent())
-      return ResponseHub.defaultUnauthorizedResponse(); // change to "wrong password"
+      return ResponseHub.defaultWrongPassword();
+
     if (userRepository.findAll().size() > 4)
-      return new ResponseEntity<>("2 much", HttpStatus.BAD_REQUEST);
+      return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
 
     String newUsername = data.get("username");
     if (userRepository.findByUsername(newUsername).isPresent())
-      return new ResponseEntity<>("no wae", HttpStatus.BAD_REQUEST);
+      return ResponseHub.defaultNotAllowed("Admin already exists");
+
     String newPassword = data.get("password");
-    return new ResponseEntity<>(userRepository.save(new User(newUsername, newPassword)), HttpStatus.OK);
+    User createdUser = userRepository.save(new User(newUsername, newPassword));
+    return ResponseHub.defaultCreated(createdUser);
   }
 
+  /**
+   *
+   */
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
     if (credentials.get("username") == null && credentials.get("password") == null)
-      return new ResponseEntity<>("is no good papi", HttpStatus.BAD_REQUEST);
+      return ResponseHub.defaultBadRequest();
 
     String username = credentials.get("username");
     String password = credentials.get("password");
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
     return user.isPresent()
-        ? new ResponseEntity<>(tokenService.createToken(user.get()), HttpStatus.OK)
-        : new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        ? new ResponseEntity<>(
+        new HashMap<String, String>() {{
+          put("status", "Logged In");
+          put("message", tokenService.createToken(user.get()));
+        }}
+        , HttpStatus.OK)
+        : ResponseHub.defaultBadRequest();
   }
 
+  /**
+   *
+   */
   @PostMapping("/logout")
   public ResponseEntity<?> logout(@RequestParam(required = false) String token) {
     return tokenService.isValid(token)
         ? new ResponseEntity<>(logoutUser(token), HttpStatus.OK)
-        : new ResponseEntity<>(" alrady logged out", HttpStatus.NOT_FOUND);
+        : ResponseHub.defaultBadRequest();
   }
 
-  private String logoutUser(String token) {
+  private ResponseEntity<?> logoutUser(String token) {
     tokenService.delete(token);
-    return "is logged out";
+    return new ResponseEntity<>(
+        new HashMap<String, String>() {{
+          put("status", "Ok");
+          put("message", "Logged out");
+        }}, HttpStatus.OK);
   }
 
 }

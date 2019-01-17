@@ -2,6 +2,7 @@ package rigor.io.paragala.voter.voting;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ import java.util.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
+@RequestMapping("/api/voters")
 public class VoterController {
 
   private VoterRepository voterRepository;
@@ -28,53 +29,49 @@ public class VoterController {
     this.voteBoxService = voteBoxService;
   }
 
-  @GetMapping("/voters")
+  /**
+   *
+   */
+  @GetMapping("")
   public ResponseEntity<?> getVoters(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    return new ResponseEntity<>(voterRepository.findAll(), HttpStatus.OK);
+    List<Voter> voters = voterRepository.findAll();
+    return ResponseHub.defaultFound(voters);
   }
 
-  @PostMapping("/voters")
+  /**
+   *
+   */
+  @PostMapping("")
   public ResponseEntity<?> addStudents(@RequestParam(required = false) String token,
                                        @RequestBody List<Voter> voters) {
-    return tokenService.isValid(token)
-        ? new ResponseEntity<>(voterRepository.saveAll(voters), HttpStatus.OK)
-        : ResponseHub.defaultUnauthorizedResponse();
-  }
-
-  @GetMapping("/defaults/voters")
-  public ResponseEntity<?> defaultVoters(@RequestParam(required = false) String token) {
-    if (!tokenService.isValid(token))
+    if (tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    voterRepository.deleteAll();
-    return new ResponseEntity<>(voterRepository.saveAll(
-        new ArrayList<>(Arrays.asList(
-            new Voter("Holy Angel University", "1312312"),
-            new Voter("Angeles University Foundation", "2312312"),
-            new Voter("Mabalacat City College", "3312312"),
-            new Voter("Tarlac State Univesity", "4312312"),
-            new Voter("Benguet State University", "5312312")
-        ))
-    ), HttpStatus.OK);
+    Iterable<Voter> iterable = voterRepository.saveAll(voters);
+    List<Voter> createdVoters = Lists.newArrayList(iterable);
+    return ResponseHub.defaultCreated(createdVoters);
   }
 
+  /**
+   *
+   */
   @PostMapping("/vote")
   public ResponseEntity<?> vote(@RequestBody Map<String, Object> data) throws IOException {
     String uniqueId = String.valueOf(data.get("id"));
     String voterCode = String.valueOf(data.get("code"));
     String school = String.valueOf(data.get("school"));
-    Optional<Voter> idschool = voterRepository.findByUniqueIdAndSchool(uniqueId, school);
+    Optional<Voter> optionalVoter = voterRepository.findByUniqueIdAndSchool(uniqueId, school);
 
-    if (!idschool.isPresent())
+    if (!optionalVoter.isPresent())
       return new ResponseEntity<>(new HashMap<String, Object>() {{
         put("status", "Not found");
         put("message", "Wrong school or uniqueId");
       }}, HttpStatus.BAD_REQUEST);
 
-    Voter voter = idschool.get();
+    Voter voter = optionalVoter.get();
 
     if (!voter.isEligible())
       return new ResponseEntity<>(new HashMap<String, Object>() {{
@@ -99,7 +96,25 @@ public class VoterController {
     return new ResponseEntity<>(new HashMap<String, Object>() {{
       put("status", "Success");
       put("message", "Thank you for voting!");
-    }}, HttpStatus.BAD_REQUEST);
+    }}, HttpStatus.ACCEPTED);
   }
 
+
+  @Deprecated
+  @GetMapping("/defaults/voters")
+  public ResponseEntity<?> defaultVoters(@RequestParam(required = false) String token) {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    voterRepository.deleteAll();
+    return new ResponseEntity<>(voterRepository.saveAll(
+        new ArrayList<>(Arrays.asList(
+            new Voter("Holy Angel University", "1312312"),
+            new Voter("Angeles University Foundation", "2312312"),
+            new Voter("Mabalacat City College", "3312312"),
+            new Voter("Tarlac State Univesity", "4312312"),
+            new Voter("Benguet State University", "5312312")
+        ))
+    ), HttpStatus.OK);
+  }
 }

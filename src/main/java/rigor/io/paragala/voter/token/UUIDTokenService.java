@@ -26,7 +26,7 @@ public class UUIDTokenService implements TokenService {
 
   @Override
   public boolean isValid(String token) {
-    return tokens.get(token) != null;
+    return tokens.get("" + token) != null; // guarding against null?
   }
 
   @Override
