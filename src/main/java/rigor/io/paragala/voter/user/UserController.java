@@ -21,7 +21,7 @@ public class UserController {
   public UserController(TokenService tokenService, UserRepository userRepository) {
     this.tokenService = tokenService;
     this.userRepository = userRepository;
-    this.userRepository.save(new User("paragala.ph", "p4r4g4l4"));
+    this.userRepository.save(new User("paragala.ph", "paragala"));
   }
 
   /**
@@ -54,7 +54,7 @@ public class UserController {
   }
 
   /**
-   *
+   * TODO check below
    */
   @PostMapping("")
   public ResponseEntity<?> create(@RequestParam(required = false) String token,
@@ -73,12 +73,12 @@ public class UserController {
     if (userRepository.findAll().size() > 4)
       return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
 
-    String newUsername = data.get("username");
-    if (userRepository.findByUsername(newUsername).isPresent())
+    String email = data.get("email"); // TODO parse and send email
+    if (userRepository.findByUsername(email).isPresent())
       return ResponseHub.defaultNotAllowed("Admin already exists");
 
     String newPassword = data.get("password");
-    User createdUser = userRepository.save(new User(newUsername, newPassword));
+    User createdUser = userRepository.save(new User(email, newPassword));
     return ResponseHub.defaultCreated(createdUser);
   }
 
@@ -93,6 +93,7 @@ public class UserController {
     String username = credentials.get("username");
     String password = credentials.get("password");
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
+    System.out.println("watashi wa kite" + user.isPresent());
     return user.isPresent()
         ? new ResponseEntity<>(
         new HashMap<String, String>() {{

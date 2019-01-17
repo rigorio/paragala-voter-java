@@ -83,6 +83,8 @@ public class DataController {
   /**
    *
    */
+  @CrossOrigin
+
   @GetMapping("/categories")
   public ResponseEntity<?> getCategories(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))
@@ -138,7 +140,6 @@ public class DataController {
   }
 
 
-
   /**
    * TODO add filter for existing nominees
    */
@@ -156,15 +157,13 @@ public class DataController {
    * Http DELETE does not accept body
    * TODO check if id can also be retrieved, delete by id instead
    */
-  @PostMapping("/delete/nominees")
+  @DeleteMapping("/nominees/{id}")
   public ResponseEntity<?> deleteNominee(@RequestParam(required = false) String token,
-                                         @RequestBody Map<String, String> data) {
+                                         @PathVariable String id) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    String title = data.get("title");
-    String category = data.get("category");
-    nomineeRepository.deleteByTitleAndCategory(title, category);
+    nomineeRepository.deleteById(Long.parseLong(id));
     return ResponseHub.defaultDeleted();
   }
 
