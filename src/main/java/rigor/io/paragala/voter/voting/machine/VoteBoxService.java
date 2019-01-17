@@ -58,7 +58,9 @@ public class VoteBoxService {
 
     for (NomineeTally nomineeTally : nomineeTallies) {
       Nominee nominee = nomineeRepository.findById(nomineeTally.getNomineeId()).get();
+      System.out.println(nominee);
       fullNomineeTallies.add(FullNomineeTally.builder()
+                                 .tally(nomineeTally.getTally())
                                  .title(nominee.getTitle())
                                  .company(nominee.getCompany())
                                  .category(nominee.getCategory())
@@ -87,9 +89,8 @@ public class VoteBoxService {
     for (Nominee nominee : nominees) {
       completeNominees.add(
           all.stream().filter(n ->
-                  n.getTitle().equals(nominee.getTitle()) &&
-                  n.getCategory().equals(nominee.getCategory())
-          )
+                                  n.getTitle().equals(nominee.getTitle()) &&
+                                      n.getCategory().equals(nominee.getCategory()))
               .findAny().get()
       );
     }

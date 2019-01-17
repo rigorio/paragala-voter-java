@@ -28,7 +28,7 @@ public class VoterApplicationTests {
 				new School(1L, "bA")
 		));
 
-		String[] sc = schools.stream().map(School::getSchool).collect(Collectors.toList()).toArray(new String[schools.size()]);
+		String[] sc = schools.stream().map(School::getName).collect(Collectors.toList()).toArray(new String[schools.size()]);
 		for (int i = 0; i < sc.length; i++) {
 			System.out.println(sc[i]);
 		};
