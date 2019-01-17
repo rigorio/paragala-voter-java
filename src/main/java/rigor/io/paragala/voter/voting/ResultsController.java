@@ -11,22 +11,22 @@ import rigor.io.paragala.voter.voting.machine.VoteFormRepository;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
-public class AdminController {
+@RequestMapping("/api/data")
+public class ResultsController {
 
   private VoteBoxService voteBoxService;
   private TokenService tokenService;
-  private NomineeRepository nomineeRepository;
   private VoteFormRepository voteFormRepository;
 
-  public AdminController(VoteBoxService voteBoxService, TokenService tokenService, NomineeRepository nomineeRepository, VoteFormRepository voteFormRepository) {
+  public ResultsController(VoteBoxService voteBoxService,
+                           TokenService tokenService,
+                           VoteFormRepository voteFormRepository) {
     this.voteBoxService = voteBoxService;
     this.tokenService = tokenService;
-    this.nomineeRepository = nomineeRepository;
     this.voteFormRepository = voteFormRepository;
   }
 
-  @GetMapping("/data/results")
+  @GetMapping("/results")
   public ResponseEntity<?> viewVotes(@RequestParam(required = false) String token) {
 //      boolean isValid = tokenService.isValid(token);
 //
@@ -36,14 +36,14 @@ public class AdminController {
     return new ResponseEntity<>(voteBoxService.getAllVotes(), HttpStatus.OK);
   }
 
-  @GetMapping("/votes/v2")
+  @GetMapping("/votes/v1")
   public ResponseEntity<?> viewFullVotes(@RequestParam(required = false) String token) {
     return tokenService.isValid(token)
         ? new ResponseEntity<>(voteBoxService.getFullNomineeTallies(), HttpStatus.OK)
         : ResponseHub.defaultUnauthorizedResponse();
   }
 
-  @GetMapping("/votes/v3")
+  @GetMapping("/votes/v2")
   public ResponseEntity<?> viewFullVotes2(@RequestParam(required = false) String token) {
     return tokenService.isValid(token)
         ? new ResponseEntity<>(voteFormRepository.findAll(), HttpStatus.OK)

@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@CrossOrigin
+@RequestMapping("/api/account")
 public class RegistrantController {
 
   private RegistrantVerifier registrantVerifier;

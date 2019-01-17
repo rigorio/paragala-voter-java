@@ -15,6 +15,7 @@ import java.util.*;
 
 @RestController
 @CrossOrigin
+@RequestMapping("/api")
 public class VoterController {
 
   private VoterRepository voterRepository;
@@ -29,7 +30,8 @@ public class VoterController {
 
   @GetMapping("/voters")
   public ResponseEntity<?> getVoters(@RequestParam(required = false) String token) {
-
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
 
     return new ResponseEntity<>(voterRepository.findAll(), HttpStatus.OK);
   }
@@ -44,6 +46,9 @@ public class VoterController {
 
   @GetMapping("/defaults/voters")
   public ResponseEntity<?> defaultVoters(@RequestParam(required = false) String token) {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
     voterRepository.deleteAll();
     return new ResponseEntity<>(voterRepository.saveAll(
         new ArrayList<>(Arrays.asList(

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SchoolRepository extends CrudRepository<School, Long> {
   List<School> findAll();
+  void deleteByName(String name);
 }

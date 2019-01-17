@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface NomineeRepository extends JpaRepository<Nominee, Long> {
   List<Nominee> findAll();
+  void deleteByTitleAndCategory(String title, String category);
 }

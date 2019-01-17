@@ -17,9 +17,9 @@ public class Category {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  private String category;
+  private String kategory;
 
-  public Category(String category) {
-    this.category = category;
+  public Category(String kategory) {
+    this.kategory = kategory;
   }
 }

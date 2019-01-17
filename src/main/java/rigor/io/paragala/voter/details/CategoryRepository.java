@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface CategoryRepository extends CrudRepository<Category, Long> {
   List<Category> findAll();
+  void deleteByKategory(String kategory);
 }
