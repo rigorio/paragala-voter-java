@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Voter {
 
   @Id

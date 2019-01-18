@@ -2,7 +2,6 @@ package rigor.io.paragala.voter.voting;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,13 +45,12 @@ public class VoterController {
    */
   @PostMapping("")
   public ResponseEntity<?> addStudents(@RequestParam(required = false) String token,
-                                       @RequestBody List<Voter> voters) {
-    if (tokenService.isValid(token))
+                                       @RequestBody Voter voter) {
+    if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    Iterable<Voter> iterable = voterRepository.saveAll(voters);
-    List<Voter> createdVoters = Lists.newArrayList(iterable);
-    return ResponseHub.defaultCreated(createdVoters);
+    Voter savedVoter = voterRepository.save(voter);
+    return ResponseHub.defaultCreated(savedVoter);
   }
 
   /**
