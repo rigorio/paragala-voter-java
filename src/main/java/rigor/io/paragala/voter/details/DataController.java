@@ -1,5 +1,7 @@
 package rigor.io.paragala.voter.details;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,8 @@ import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
 import rigor.io.paragala.voter.token.TokenService;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,9 +45,7 @@ public class DataController {
    *
    */
   @GetMapping("/schools")
-  public ResponseEntity<?> getSchools(@RequestParam(required = false) String token) {
-    if (!tokenService.isValid(token))
-      return ResponseHub.defaultUnauthorizedResponse();
+  public ResponseEntity<?> getSchools() {
 
     List<School> all = schoolRepository.findAll();
     String[] schools = all
@@ -59,11 +61,11 @@ public class DataController {
    */
   @PostMapping("/schools")
   public ResponseEntity<?> addSchools(@RequestParam(required = false) String token,
-                                      @RequestBody String school) {
+                                      @RequestBody Map<String, String> school) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    School savedSchool = schoolRepository.save(new School(school));
+    School savedSchool = schoolRepository.save(new School(school.get("school")));
     return ResponseHub.defaultCreated(savedSchool);
   }
 
@@ -83,12 +85,8 @@ public class DataController {
   /**
    *
    */
-  @CrossOrigin
-
   @GetMapping("/categories")
-  public ResponseEntity<?> getCategories(@RequestParam(required = false) String token) {
-    if (!tokenService.isValid(token))
-      return ResponseHub.defaultUnauthorizedResponse();
+  public ResponseEntity<?> getCategories() {
 
     List<Category> all = categoryRepository.findAll();
     String[] categories = all
@@ -104,14 +102,12 @@ public class DataController {
    */
   @PostMapping("/categories")
   public ResponseEntity<?> addCategories(@RequestParam(required = false) String token,
-                                         @RequestBody String[] categories) {
+                                         @RequestBody Map<String, String> category) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    List<Category> categoryList = Arrays.stream(categories).map(Category::new).collect(Collectors.toList());
-    Iterable<Category> iterable = categoryRepository.saveAll(categoryList);
-    List<Category> createdCategories = Lists.newArrayList(iterable);
-    return ResponseHub.defaultCreated(createdCategories);
+    Category savedCategory = categoryRepository.save(new Category(category.get("category")));
+    return ResponseHub.defaultCreated(savedCategory);
   }
 
   /**
@@ -131,9 +127,7 @@ public class DataController {
    *
    */
   @GetMapping("/nominees")
-  public ResponseEntity<?> getNominees(@RequestParam(required = false) String token) {
-    if (!tokenService.isValid(token))
-      return ResponseHub.defaultUnauthorizedResponse();
+  public ResponseEntity<?> getNominees() {
 
     List<Nominee> nominees = nomineeRepository.findAll();
     return ResponseHub.defaultFound(nominees);
@@ -150,12 +144,12 @@ public class DataController {
       return ResponseHub.defaultUnauthorizedResponse();
 
     List<Nominee> createdNominees = nomineeRepository.saveAll(nominees);
-    return ResponseHub.defaultCreated(createdNominees);
+    createdNominees.forEach(System.out::println);
+    return ResponseHub.defaultCreated(nomineeRepository.findAll());
   }
 
   /**
-   * Http DELETE does not accept body
-   * TODO check if id can also be retrieved, delete by id instead
+   *
    */
   @DeleteMapping("/nominees/{id}")
   public ResponseEntity<?> deleteNominee(@RequestParam(required = false) String token,
@@ -167,27 +161,42 @@ public class DataController {
     return ResponseHub.defaultDeleted();
   }
 
-
-  // TODO! DEFAULTS: DO NOT USE !!
+  // TODO! DEFAULTS
   @GetMapping("/defaults/categories")
-  public ResponseEntity<?> defaultCategories(@RequestParam(required = false) String token) {
+  public ResponseEntity<?> defaultCategories(@RequestParam(required = false) String token) throws IOException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    //    categoryRepository.deleteAll();
-    return new ResponseEntity<>(
-        new HashSet<>(Arrays.asList(categories)),
-        HttpStatus.OK
-    );
+    List<Category> categories = new ArrayList<>();
+    populate().forEach(nominee -> categories.add(new Category(nominee.getCategory())));
+    categoryRepository.deleteAll();
+
+    HashSet<Category> categg = new HashSet<>(categories);
+    Iterable<Category> categories1 = categoryRepository.saveAll(categg);
+
+    String[] categs = categg
+        .stream()
+        .map(Category::getKategory)
+        .collect(Collectors.toList())
+        .toArray(new String[categg.size()]);
+    return ResponseHub.defaultCreated(categs);
   }
 
+  /**
+   * will empty the repository and provide default data
+   *
+   * @param token
+   * @return
+   * @throws IOException
+   */
   @GetMapping("/defaults/nominees")
-  public ResponseEntity<?> defaultNominees(@RequestParam(required = false) String token) {
+  public ResponseEntity<?> defaultNominees(@RequestParam(required = false) String token) throws IOException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
     nomineeRepository.deleteAll();
-    return new ResponseEntity<>(nomineeRepository.saveAll(populate()), HttpStatus.OK);
+    List<Nominee> nominees = nomineeRepository.saveAll(populate());
+    return ResponseHub.defaultCreated(nominees);
   }
 
   @GetMapping("/defaults/schools")
@@ -195,24 +204,26 @@ public class DataController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    return new ResponseEntity<>(new HashSet<String>() {{
-      add("Holy Angel University");
-      add("Angeles University Foundation");
-      add("Mabalacat City College");
-      add("Tarlac State Univesity");
-      add("Benguet State University");
-    }}, HttpStatus.OK);
+    List<School> list = new ArrayList() {{
+      add(new School("Holy Angel University"));
+      add(new School("Angeles University Foundation"));
+      add(new School("Mabalacat City College"));
+      add(new School("Tarlac State Univesity"));
+      add(new School("Benguet State University"));
+    }};
+    schoolRepository.deleteAll();
+    schoolRepository.saveAll(list);
+    String[] schools = list
+        .stream()
+        .map(School::getName)
+        .collect(Collectors.toList())
+        .toArray(new String[list.size()]);
+    return ResponseHub.defaultCreated(schools);
   }
 
-  private List<Nominee> populate() {
-    List<Nominee> nominees = new ArrayList<>();
-    for (int i = 0; i < titles.length; i++) {
-      nominees.add(new Nominee(
-          titles[i],
-          companies[i],
-          categories[i]
-      ));
-    }
+  private List<Nominee> populate() throws IOException {
+    File file = new File("src/main/resources/results.json");
+    List<Nominee> nominees = new ObjectMapper().readValue(file, new TypeReference<List<Nominee>>() {});
     return nominees;
   }
 
