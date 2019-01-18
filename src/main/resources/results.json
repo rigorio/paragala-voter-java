@@ -1,0 +1,372 @@
+[
+  {
+    "title": "Public Eye: Klasrum Kalsada PTV 4 Public Affairs",
+    "company": "PTV 4",
+    "category": "Best Documentary"
+  },
+  {
+    "title": "Philippine Seas by Atom Araullo",
+    "company": "GMA",
+    "category": "Best Documentary"
+  },
+  {
+    "title": "Reel Time: Salat",
+    "company": "GMA",
+    "category": "Best Documentary"
+  },
+  {
+    "title": "'Di ka Pasisiil by Jeff Canoy and Chiara Zambrano",
+    "company": "ABS-CBN",
+    "category": "Best Documentary"
+  },
+  {
+    "title": "Chiara Zambrano in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Maricel Halili in Aksyon Tonite",
+    "company": "TV5",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Karol Di in PTV News",
+    "company": "PTV 4",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Sandra Aguinaldo in 24 Oras",
+    "company": "GMA",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Doris Bigornia in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Ina Andolong in Newsroom",
+    "company": "CNN Philippines",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Susan Enriquez in 24 Oras",
+    "company": "GMA",
+    "category": "Best Female Field Reporter"
+  },
+  {
+    "title": "Amy Perez in Umagang Kay Ganda",
+    "company": "ABS-CBN",
+    "category": "Best Female Morning Show Host"
+  },
+  {
+    "title": "Love Anover in Unang Hirit",
+    "company": "GMA",
+    "category": "Best Female Morning Show Host"
+  },
+  {
+    "title": "Claire Celdran in New Day",
+    "company": "CNN Philippines",
+    "category": "Best Female Morning Show Host"
+  },
+  {
+    "title": "Dianne Medina in Bagong Pilipinas",
+    "company": "PTV 4",
+    "category": "Best Female Morning Show Host"
+  },
+  {
+    "title": "Suzie Entrata-Abrera in Unang Hirit",
+    "company": "GMA",
+    "category": "Best Female Morning Show Host"
+  },
+  {
+    "title": "Winnie Cornejo in Umagang Kay Ganda",
+    "company": "ABS-CBN",
+    "category": "Best Female Morning Show Host"
+  },
+  {
+    "title": "Pia Archanghel in Saksi",
+    "company": "GMA",
+    "category": "Best Female News Anchor"
+  },
+  {
+    "title": "Mitzi Borromeo in Newsroom",
+    "company": "CNN Philippines",
+    "category": "Best Female News Anchor"
+  },
+  {
+    "title": "Dianne Querrer in PTV News",
+    "company": "PTV 4",
+    "category": "Best Female News Anchor"
+  },
+  {
+    "title": "Vicky Morales in 24 Oras",
+    "company": "GMA",
+    "category": "Best Female News Anchor"
+  },
+  {
+    "title": "Mae Ann Los Banos in Aksyon Tonite",
+    "company": "TV5",
+    "category": "Best Female News Anchor"
+  },
+  {
+    "title": "Bernadette Sembrano in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Female News Anchor"
+  },
+  {
+    "title": "DWBL 91.9",
+    "company": "Bright FM",
+    "category": "Best Local Radio Station"
+  },
+  {
+    "title": "UFM 105.1",
+    "company": "You're on the right side",
+    "category": "Best Local Radio Station"
+  },
+  {
+    "title": "GV FM 99.1",
+    "company": "Your Good Vibes",
+    "category": "Best Local Radio Station"
+  },
+  {
+    "title": "DWCL 92.7",
+    "company": "Brigada News FM",
+    "category": "Best Local Radio Station"
+  },
+  {
+    "title": "RW 95.1",
+    "company": "Keni na ka!",
+    "category": "Best Local Radio Station"
+  },
+  {
+    "title": "ABS-CBN Pampanga TV 46",
+    "company": "ABS-CBN",
+    "category": "Best Local Television Station"
+  },
+  {
+    "title": "GNN 44 Infomax 9",
+    "company": "GNN",
+    "category": "Best Local Television Station"
+  },
+  {
+    "title": "Community TV 3",
+    "company": "CTV 3",
+    "category": "Best Local Television Station"
+  },
+  {
+    "title": "CLTV 36",
+    "company": "CLTV",
+    "category": "Best Local Television Station"
+  },
+  {
+    "title": "Kapuso mo, Jessica Soho",
+    "company": "GMA",
+    "category": "Best Magazine Show"
+  },
+  {
+    "title": "IJuander",
+    "company": "GMA",
+    "category": "Best Magazine Show"
+  },
+  {
+    "title": "My Puhunan",
+    "company": "ABS-CBN",
+    "category": "Best Magazine Show"
+  },
+  {
+    "title": "RATED K",
+    "company": "ABS-CBN",
+    "category": "Best Magazine Show"
+  },
+  {
+    "title": "Doland Castro in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "Joseph Morong in 24 Oras",
+    "company": "GMA",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "Raffy Tima in 24 Oras",
+    "company": "GMA",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "Renz Ongkiko in Aksyon Tonite",
+    "company": "TV5",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "JM Encinas in PTV News",
+    "company": "PTV 4",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "Jorge Carino in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "David Santos in Newsroom",
+    "company": "CNN Philippines",
+    "category": "Best Male Field Reporter"
+  },
+  {
+    "title": "Tonipet Gaba in Unang Hirit",
+    "company": "GMA",
+    "category": "Best Male Morning Show Host"
+  },
+  {
+    "title": "Jules Guiang in Bagong Pilipinas",
+    "company": "PTV 4",
+    "category": "Best Male Morning Show Host"
+  },
+  {
+    "title": "Ivan Mayrina in Unang Hirit",
+    "company": "GMA",
+    "category": "Best Male Morning Show Host"
+  },
+  {
+    "title": "Anthony Taberna in Umagang Kay Ganda",
+    "company": "ABS-CBN",
+    "category": "Best Male Morning Show Host"
+  },
+  {
+    "title": "Andrei Felix in New Day",
+    "company": "CNN Philippines",
+    "category": "Best Male Morning Show Host"
+  },
+  {
+    "title": "Ariel Ureta in Umagang Kay Ganda",
+    "company": "ABS-CBN",
+    "category": "Best Male Morning Show Host"
+  },
+  {
+    "title": "Alex Santos in Sentro Balita",
+    "company": "PTV 4",
+    "category": "Best Male News Anchor"
+  },
+  {
+    "title": "Arnold Clavio in Saksi",
+    "company": "GMA",
+    "category": "Best Male News Anchor"
+  },
+  {
+    "title": "Erwin Tulfo in PTV News",
+    "company": "PTV 4",
+    "category": "Best Male News Anchor"
+  },
+  {
+    "title": "Ted Failon in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Male News Anchor"
+  },
+  {
+    "title": "Ed Lingao in Aksyon Tonite",
+    "company": "TV5",
+    "category": "Best Male News Anchor"
+  },
+  {
+    "title": "Noli De Castro in TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best Male News Anchor"
+  },
+  {
+    "title": "New Day",
+    "company": "CNN Philippines",
+    "category": "Best Morning Show"
+  },
+  {
+    "title": "Unang Hirit",
+    "company": "GMA",
+    "category": "Best Morning Show"
+  },
+  {
+    "title": "Magandang Buhay",
+    "company": "ABS-CBN",
+    "category": "Best Morning Show"
+  },
+  {
+    "title": "Bagong Pilipinas",
+    "company": "PTV 4",
+    "category": "Best Morning Show"
+  },
+  {
+    "title": "Umagang Kay Ganda",
+    "company": "ABS-CBN",
+    "category": "Best Morning Show"
+  },
+  {
+    "title": "Alto Broadcasting System - Chronic Broadcasting Network",
+    "company": "ABS-CBN",
+    "category": "Best National Television Station"
+  },
+  {
+    "title": "TV 5",
+    "company": "TV5",
+    "category": "Best National Television Station"
+  },
+  {
+    "title": "Greater Manila Area",
+    "company": "GMA",
+    "category": "Best National Television Station"
+  },
+  {
+    "title": "People's Television",
+    "company": "PTV 4",
+    "category": "Best National Television Station"
+  },
+  {
+    "title": "Saksi",
+    "company": "GMA",
+    "category": "Best News Program"
+  },
+  {
+    "title": "Bandila",
+    "company": "ABS-CBN",
+    "category": "Best News Program"
+  },
+  {
+    "title": "Aksyon Tonite",
+    "company": "TV5",
+    "category": "Best News Program"
+  },
+  {
+    "title": "24 Oras",
+    "company": "GMA",
+    "category": "Best News Program"
+  },
+  {
+    "title": "Newsroom",
+    "company": "CNN Philippines",
+    "category": "Best News Program"
+  },
+  {
+    "title": "PTV News",
+    "company": "PTV 4",
+    "category": "Best News Program"
+  },
+  {
+    "title": "TV Patrol",
+    "company": "ABS-CBN",
+    "category": "Best News Program"
+  },
+  {
+    "title": "Bong Lacson",
+    "company": "Punto! Central Luzon",
+    "category": "Journalist of the Year"
+  },
+  {
+    "title": "Ashley Manabat",
+    "company": "Punto! Central Luzon",
+    "category": "Journalist of the Year"
+  },
+  {
+    "title": "Frederico Pascual",
+    "company": "Philippine Star",
+    "category": "Journalist of the Year"
+  }
+]
