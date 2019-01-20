@@ -43,7 +43,7 @@ public class RegistrantController {
     if (!isConfirmed){
       map.put("status", "Bad request");
       map.put("message", "There was a problem with your request. Contact your administrator for more details");
-      return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(map, HttpStatus.OK);
     }
     map.put("status", "Account successfully created!");
     map.put("message", "Please proceed to vote on the paragala app");

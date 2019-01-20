@@ -23,7 +23,7 @@ public class EmailSender {
     message.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(email));
     message.setSubject("Paragala voter registration");
-    String link = host + "/api/confirmation?code=" + voterCode;
+    String link = host + "/api/account/confirmation?code=" + voterCode;
     String msg = "Your voter code is: " + voterCode + ". " +
         "Please click the link to confirm your registration: " + link;
 

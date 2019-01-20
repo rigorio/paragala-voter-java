@@ -80,7 +80,7 @@ public class VoterController {
       return new ResponseEntity<>(new HashMap<String, Object>() {{
         put("status", "Not found");
         put("message", "Wrong school or uniqueId");
-      }}, HttpStatus.BAD_REQUEST);
+      }}, HttpStatus.OK);
 
     Voter voter = optionalVoter.get();
 
@@ -88,13 +88,13 @@ public class VoterController {
       return new ResponseEntity<>(new HashMap<String, Object>() {{
         put("status", "Not allowed");
         put("message", "You are no longer eligible to vote. Please contact your administrator for concerns.");
-      }}, HttpStatus.BAD_REQUEST);
+      }}, HttpStatus.OK);
 
     if (!voter.getVoterCode().equals(voterCode))
       return new ResponseEntity<>(new HashMap<String, Object>() {{
         put("status", "Wrong code");
         put("message", "Please use your proper voter code");
-      }}, HttpStatus.BAD_REQUEST);
+      }}, HttpStatus.OK);
 
     ObjectMapper mapper = new ObjectMapper();
 
