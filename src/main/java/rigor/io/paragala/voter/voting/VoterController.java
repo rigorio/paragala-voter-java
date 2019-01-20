@@ -56,6 +56,19 @@ public class VoterController {
   /**
    *
    */
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteStudent(@RequestParam(required = false) String token,
+                                         @PathVariable Long id) {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    voterRepository.deleteById(id);
+    return ResponseHub.defaultDeleted();
+  }
+
+  /**
+   *
+   */
   @PostMapping("/vote")
   public ResponseEntity<?> vote(@RequestBody Map<String, Object> data) throws IOException {
     String uniqueId = String.valueOf(data.get("id"));

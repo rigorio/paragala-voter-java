@@ -25,6 +25,13 @@ public class UserController {
   }
 
   /**
+   * endpoint to invoke if dyno build sleeps on heroku
+   */
+  public ResponseEntity<?> awaken() {
+    return new ResponseEntity<>("Sleeping dyno awakened.", HttpStatus.OK);
+  }
+
+  /**
    *
    */
   @PostMapping("/paragala")
