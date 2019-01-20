@@ -33,7 +33,7 @@ public class RegistrantController {
     }
     map.put("status", "Registration Failed");
     map.put("message", "Voter has not been verified by administration");
-    return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
+    return new ResponseEntity<>(map, HttpStatus.OK);
   }
 
   @GetMapping("/confirmation")
