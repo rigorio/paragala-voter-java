@@ -49,7 +49,7 @@ public class EmailSender {
 
     message.setSubject("Account confirmation");
     String code = new String(Base64.getEncoder().withoutPadding()
-                                 .encode((email + "@" + key).getBytes()));
+                                 .encode((email + "@@" + key).getBytes()));
     String link = host + "/api/users/confirmation?code=" + code;
     String msg = "Please click the link to confirm your registration: " + link;
     sendMessage(mimeBodyPart, msg);

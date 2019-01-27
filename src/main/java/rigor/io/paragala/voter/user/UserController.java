@@ -8,6 +8,7 @@ import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.verification.EmailSender;
 
 import javax.mail.MessagingException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +74,7 @@ public class UserController {
   }
 
   /**
-   * TODO check below
+   *
    */
   @PostMapping("")
   public ResponseEntity<?> create(@RequestParam(required = false) String token,
@@ -95,7 +96,7 @@ public class UserController {
     if (userRepository.findAll().size() > 4)
       return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
 
-    String email = data.get("email"); // TODO parse and send email and create email confirmation
+    String email = data.get("email");
     String newUserName = email.split("@")[0];
     if (userRepository.findByUsername(newUserName).isPresent())
       return ResponseHub.defaultNotAllowed("That email is already in use!");
@@ -104,9 +105,25 @@ public class UserController {
 
     EmailSender emailSender = new EmailSender();
     emailSender.sendAdminEmail(newUserName, newPassword);
+    Map<String, String> map = new HashMap<>();
+    map.put("status", "Email Sent");
+    map.put("message", "Please confirm your registration through your email");
+    return new ResponseEntity<>(map, HttpStatus.OK);
 
-    User createdUser = userRepository.save(new User(newUserName, newPassword));
-    return ResponseHub.defaultCreated(createdUser);
+  }
+
+  @GetMapping("/confirmation")
+  public ResponseEntity<?> confirmation(@RequestParam String code) {
+
+    String[] confCode = new String(Base64.getDecoder().decode(code)).split("@@");
+    String username = confCode[0];
+    String password = confCode[1];
+
+    userRepository.save(new User(username, password));
+    Map<String, String> map = new HashMap<>();
+    map.put("status", "Success");
+    map.put("message", "Account Created");
+    return new ResponseEntity<>(map, HttpStatus.OK);
   }
 
   /**
