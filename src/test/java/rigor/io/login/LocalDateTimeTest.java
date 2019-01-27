@@ -10,9 +10,9 @@ public class LocalDateTimeTest {
   public void testDateTime() {
     LocalDateTime now = LocalDateTime.now();
     System.out.println(now);
-    LocalDateTime start = LocalDateTime.parse("2017-04-23T09:00");
+    LocalDateTime start = LocalDateTime.parse("2019-01-27T15:46:00");
 
-    String owari = "2020-12-22T23:00";
+    String owari = "2019-03-27T15:46:00";
     LocalDateTime end = LocalDateTime.parse(owari);
     System.out.println(now.isBefore(end) && now.isAfter(start));
     System.out.println(start);

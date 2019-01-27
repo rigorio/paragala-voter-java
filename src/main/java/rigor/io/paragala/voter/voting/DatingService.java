@@ -19,8 +19,8 @@ public class DatingService {
   }
 
   public void setStartEnd(String s, String e){
-    start = LocalDateTime.parse(s);
-    end = LocalDateTime.parse(e);
+    start = LocalDateTime.parse(s.replace("Z", ""));
+    end = LocalDateTime.parse(e.replace("Z", ""));
   }
 
   public String getStartDateTime() {
