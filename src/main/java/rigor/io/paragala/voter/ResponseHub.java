@@ -64,7 +64,16 @@ public class ResponseHub {
           put("status", "Bad Request");
           put("message", "Please fix your request");
         }},
-        HttpStatus.BAD_REQUEST);
+        HttpStatus.OK);
+  }
+
+  public static ResponseEntity<?> badLogin() {
+    return new ResponseEntity<>(
+        new HashMap<String, String>() {{
+          put("status", "Failed!");
+          put("message", "Login details were incorrect.");
+        }},
+        HttpStatus.OK);
   }
 
   public static ResponseEntity<?> defaultNotAllowed(String message) {

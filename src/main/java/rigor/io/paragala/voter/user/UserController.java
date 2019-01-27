@@ -115,7 +115,7 @@ public class UserController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
     if (credentials.get("username") == null && credentials.get("password") == null)
-      return ResponseHub.defaultBadRequest();
+      return ResponseHub.badLogin();
 
     String username = credentials.get("username");
     String password = credentials.get("password");
@@ -128,7 +128,7 @@ public class UserController {
           put("message", tokenService.createToken(user.get()));
         }}
         , HttpStatus.OK)
-        : ResponseHub.defaultBadRequest();
+        : ResponseHub.badLogin();
   }
 
   /**
