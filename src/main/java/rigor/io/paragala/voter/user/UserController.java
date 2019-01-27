@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.token.TokenService;
+import rigor.io.paragala.voter.verification.EmailSender;
 
+import javax.mail.MessagingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -41,10 +43,19 @@ public class UserController {
     return ResponseHub.defaultCreated(user);
   }
 
+  @GetMapping("/all")
+  public ResponseEntity<?> viewAll(@RequestParam(required = false) String token) {
+
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+  }
+
   /**
    *
    */
-  @PostMapping("/delete/{user}")
+  @PostMapping("/delete/{user}") // TODO nigger what?
   public ResponseEntity<?> deleteUser(@RequestParam(required = false) String token,
                                       @PathVariable String user,
                                       @RequestBody String password) {
@@ -66,7 +77,7 @@ public class UserController {
    */
   @PostMapping("")
   public ResponseEntity<?> create(@RequestParam(required = false) String token,
-                                  @RequestBody Map<String, String> data) {
+                                  @RequestBody Map<String, String> data) throws MessagingException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
@@ -78,15 +89,23 @@ public class UserController {
     if (!user.isPresent())
       return ResponseHub.defaultWrongPassword();
 
+    if (!user.get().getUsername().equals("paragala.ph"))
+      return ResponseHub.defaultUnauthorizedResponse();
+
     if (userRepository.findAll().size() > 4)
       return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
 
-    String email = data.get("email"); // TODO parse and send email
-    if (userRepository.findByUsername(email).isPresent())
-      return ResponseHub.defaultNotAllowed("Admin already exists");
+    String email = data.get("email"); // TODO parse and send email and create email confirmation
+    String newUserName = email.split("@")[0];
+    if (userRepository.findByUsername(newUserName).isPresent())
+      return ResponseHub.defaultNotAllowed("That email is already in use!");
 
     String newPassword = data.get("password");
-    User createdUser = userRepository.save(new User(email, newPassword));
+
+    EmailSender emailSender = new EmailSender();
+    emailSender.sendAdminEmail(newUserName, newPassword);
+
+    User createdUser = userRepository.save(new User(newUserName, newPassword));
     return ResponseHub.defaultCreated(createdUser);
   }
 

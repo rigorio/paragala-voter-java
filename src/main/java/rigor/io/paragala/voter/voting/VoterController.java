@@ -21,16 +21,15 @@ public class VoterController {
   private VoterRepository voterRepository;
   private TokenService tokenService;
   private VoteBoxService voteBoxService;
+  private DatingService datingService;
 
-  public VoterController(VoterRepository voterRepository, TokenService tokenService, VoteBoxService voteBoxService) {
+  public VoterController(VoterRepository voterRepository, TokenService tokenService, VoteBoxService voteBoxService, DatingService datingService) {
     this.voterRepository = voterRepository;
     this.tokenService = tokenService;
     this.voteBoxService = voteBoxService;
+    this.datingService = datingService;
   }
 
-  /**
-   *
-   */
   @GetMapping("")
   public ResponseEntity<?> getVoters(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))
@@ -40,9 +39,6 @@ public class VoterController {
     return ResponseHub.defaultFound(voters);
   }
 
-  /**
-   *
-   */
   @PostMapping("")
   public ResponseEntity<?> addStudents(@RequestParam(required = false) String token,
                                        @RequestBody Voter voter) {
@@ -53,9 +49,6 @@ public class VoterController {
     return ResponseHub.defaultCreated(savedVoter);
   }
 
-  /**
-   *
-   */
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteStudent(@RequestParam(required = false) String token,
                                          @PathVariable Long id) {
@@ -66,11 +59,12 @@ public class VoterController {
     return ResponseHub.defaultDeleted();
   }
 
-  /**
-   *
-   */
   @PostMapping("/vote")
   public ResponseEntity<?> vote(@RequestBody Map<String, Object> data) throws IOException {
+
+    if (!datingService.isAllowed())
+      return ResponseHub.notAllowedToDate(datingService);
+
     String uniqueId = String.valueOf(data.get("id"));
     String voterCode = String.valueOf(data.get("code"));
     String school = String.valueOf(data.get("school"));
@@ -92,8 +86,8 @@ public class VoterController {
 
     if (!voter.getVoterCode().equals(voterCode))
       return new ResponseEntity<>(new HashMap<String, Object>() {{
-        put("status", "Wrong code");
-        put("message", "Please use your proper voter code");
+        put("status", "Vote not sent");
+        put("message", "You used the wrong voter code. Please copy the code sent in your email.");
       }}, HttpStatus.OK);
 
     ObjectMapper mapper = new ObjectMapper();

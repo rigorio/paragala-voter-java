@@ -3,6 +3,7 @@ package rigor.io.paragala.voter;
 import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import rigor.io.paragala.voter.voting.DatingService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,4 +76,12 @@ public class ResponseHub {
         HttpStatus.FORBIDDEN);
   }
 
+  public static ResponseEntity<?> notAllowedToDate(DatingService datingService) {
+    return new ResponseEntity<>(
+        new HashMap<String, String>() {{
+          put("status", "Not allowed");
+          put("message", "Voting will only begin from " + datingService.getStartDateTime() + " to " + datingService.getEndDateTime());
+        }},
+        HttpStatus.OK);
+  }
 }
