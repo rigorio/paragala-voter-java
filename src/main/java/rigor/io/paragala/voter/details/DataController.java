@@ -13,6 +13,7 @@ import rigor.io.paragala.voter.token.TokenService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -222,7 +223,8 @@ public class DataController {
   }
 
   private List<Nominee> populate() throws IOException {
-    File file = new File("src/main/resources/results.json");
+    URL ara = DataController.class.getClassLoader().getResource("results.json");
+    File file = new File(ara.getFile());
     List<Nominee> nominees = new ObjectMapper().readValue(file, new TypeReference<List<Nominee>>() {});
     return nominees;
   }
