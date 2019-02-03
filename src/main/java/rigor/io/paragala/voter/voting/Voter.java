@@ -25,6 +25,7 @@ public class Voter {
   public Voter(String school, String uniqueId) {
     this.school = school;
     this.uniqueId = uniqueId;
+    this.voterCode = "";
     allowVoting();
   }
 

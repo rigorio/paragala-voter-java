@@ -2,15 +2,22 @@ package rigor.io.paragala.voter.voting;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.voting.machine.VoteBoxService;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 @RestController
@@ -40,14 +47,41 @@ public class VoterController {
   }
 
   @PostMapping("")
-  public ResponseEntity<?> addStudents(@RequestParam(required = false) String token,
-                                       @RequestBody Voter voter) {
+  public ResponseEntity<?> addStudent(@RequestParam(required = false) String token,
+                                      @RequestBody Voter voter) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
     Voter savedVoter = voterRepository.save(voter);
     return ResponseHub.defaultCreated(savedVoter);
   }
+
+  @PostMapping("/upload")
+  public ResponseEntity<?> uploadStudents(@RequestParam(required = false) String token,
+                                          @RequestParam String school,
+                                          @RequestPart(name = "file") MultipartFile file) throws IOException {
+    if (tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    if (file == null)
+      return ResponseHub.defaultBadRequest();
+
+    CsvParserSettings settings = new CsvParserSettings();
+    settings.getFormat().setLineSeparator("\n");
+    CsvParser csvParser = new CsvParser(settings);
+
+    List<String[]> strings = csvParser.parseAll(file.getInputStream());
+
+    List<Voter> voters = new ArrayList<>();
+    strings.forEach(string -> {
+      String uniqueId = string[0];
+      Voter voter = new Voter(school, uniqueId);
+      voters.add(voter);
+    });
+    Iterable<Voter> allVoters = voterRepository.saveAll(voters);
+    return ResponseHub.defaultCreated(Lists.newArrayList(allVoters));
+  }
+
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteStudent(@RequestParam(required = false) String token,
@@ -119,7 +153,7 @@ public class VoterController {
             new Voter("Mabalacat City College", "3312312"),
             new Voter("Tarlac State Univesity", "4312312"),
             new Voter("Benguet State University", "5312312")
-        ))
-    ), HttpStatus.OK);
+                                     ))
+                                                       ), HttpStatus.OK);
   }
 }
