@@ -14,10 +14,7 @@ import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.voting.machine.VoteBoxService;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 @RestController
@@ -60,7 +57,7 @@ public class VoterController {
   public ResponseEntity<?> uploadStudents(@RequestParam(required = false) String token,
                                           @RequestParam String school,
                                           @RequestPart(name = "file") MultipartFile file) throws IOException {
-    if (tokenService.isValid(token))
+    if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
     if (file == null)
