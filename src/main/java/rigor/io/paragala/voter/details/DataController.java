@@ -223,8 +223,8 @@ public class DataController {
   }
 
   private List<Nominee> populate() throws IOException {
-    URL ara = DataController.class.getClassLoader().getResource("results.json");
-    File file = new File(ara.getFile());
+    File file = new File("src/main/resources/results.json");
+
     List<Nominee> nominees = new ObjectMapper().readValue(file, new TypeReference<List<Nominee>>() {});
     return nominees;
   }
