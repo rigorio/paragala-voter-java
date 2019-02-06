@@ -1,6 +1,8 @@
 package rigor.io.paragala.voter.voting.machine;
 
 import org.springframework.stereotype.Service;
+import rigor.io.paragala.voter.details.School;
+import rigor.io.paragala.voter.details.SchoolRepository;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
 import rigor.io.paragala.voter.voting.Voter;
@@ -15,11 +17,37 @@ public class VoteBoxService {
   private VoteFormRepository voteFormRepository;
   private NomineeRepository nomineeRepository;
   private VoterRepository voterRepository;
+  private SchoolRepository schoolRepository;
 
-  public VoteBoxService(VoteFormRepository voteFormRepository, NomineeRepository nomineeRepository, VoterRepository voterRepository) {
+  public VoteBoxService(VoteFormRepository voteFormRepository, NomineeRepository nomineeRepository, VoterRepository voterRepository, SchoolRepository schoolRepository) {
     this.voteFormRepository = voteFormRepository;
     this.nomineeRepository = nomineeRepository;
     this.voterRepository = voterRepository;
+    this.schoolRepository = schoolRepository;
+  }
+
+  public List<Map<String, Object>> bySchool(String s) {
+    List<VoteForm> allVotes = voteFormRepository.findAll();
+    List<Map<String, Object>> resultsBySchool = new ArrayList<>();
+    List<Nominee> nominees = nomineeRepository.findAll();
+    for (Nominee nominee : nominees) {
+      int tally = 0;
+      Map<String, Object> result = new HashMap<>();
+      for (VoteForm voteForm : allVotes) {
+        Voter voter = voterRepository.findById(voteForm.getVoterId()).get();
+        if (voter.getSchool().equals(s)) {
+          if (voteForm.getNomineeId().equals(nominee.getId())) {
+            tally++;
+            result.put("title", nominee.getTitle());
+            result.put("company", nominee.getCompany());
+            result.put("tally", tally);
+            result.put("category", nominee.getCategory());
+            resultsBySchool.add(result);
+          }
+        }
+      }
+    }
+    return resultsBySchool;
   }
 
   public List<Map<String, Object>> getAllVotes() {
@@ -92,7 +120,7 @@ public class VoteBoxService {
                                   n.getTitle().equals(nominee.getTitle()) &&
                                       n.getCategory().equals(nominee.getCategory()))
               .findAny().get()
-      );
+                          );
     }
     for (Nominee nominee : completeNominees) {
       voteForms.add(new VoteForm(voterId, nominee.getId()));

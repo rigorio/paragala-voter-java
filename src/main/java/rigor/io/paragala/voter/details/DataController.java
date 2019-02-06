@@ -207,10 +207,8 @@ public class DataController {
 
     List<School> list = new ArrayList() {{
       add(new School("Holy Angel University"));
-      add(new School("Angeles University Foundation"));
       add(new School("Mabalacat City College"));
       add(new School("Tarlac State Univesity"));
-      add(new School("Benguet State University"));
     }};
     schoolRepository.deleteAll();
     schoolRepository.saveAll(list);

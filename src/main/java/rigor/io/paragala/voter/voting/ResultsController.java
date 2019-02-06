@@ -32,10 +32,19 @@ public class ResultsController {
   @GetMapping("/tally")
   public ResponseEntity<?> viewVotes(@RequestParam(required = false) String token) {
     if (!tokenService.isValid(token))
-        return ResponseHub.defaultUnauthorizedResponse();
+      return ResponseHub.defaultUnauthorizedResponse();
 
     List<Map<String, Object>> votes = voteBoxService.getAllVotes();
     return ResponseHub.defaultFound(votes);
+  }
+
+  @GetMapping("/school/{school}")
+  public ResponseEntity<?> viewBySchool(@RequestParam(required = false) String token,
+                                        @PathVariable String school) {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    return ResponseHub.defaultFound(voteBoxService.bySchool(school));
   }
 
   @Deprecated
