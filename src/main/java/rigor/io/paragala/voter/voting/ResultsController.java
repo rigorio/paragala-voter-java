@@ -51,8 +51,7 @@ public class ResultsController {
 
   @Deprecated
   @GetMapping("/votes/v1")
-  public ResponseE
-  ntity<?> viewFullVotes(@RequestParam(required = false) String token) {
+  public ResponseEntity<?> viewFullVotes(@RequestParam(required = false) String token) {
     return tokenService.isValid(token)
         ? new ResponseEntity<>(voteBoxService.getFullNomineeTallies(), HttpStatus.OK)
         : ResponseHub.defaultUnauthorizedResponse();
