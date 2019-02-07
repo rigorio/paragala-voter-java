@@ -77,13 +77,13 @@ public class EmailSender {
     return props;
   }
 
-  public void sendAdminEmail(String wantedUserName, String wantedPassword, Boolean isSuper) throws MessagingException {
+  public void sendAdminEmail(String email, String wantedPassword, Boolean isSuper) throws MessagingException {
 
     message.setRecipients(
-        Message.RecipientType.TO, InternetAddress.parse(wantedUserName));
+        Message.RecipientType.TO, InternetAddress.parse(email));
     MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
-
+    String wantedUserName = email.split("@")[0];
     message.setSubject("Account confirmation");
     String code = new String(Base64.getEncoder().withoutPadding()
                                  .encode((wantedUserName + "@@" + wantedPassword + "@@" + isSuper).getBytes()));

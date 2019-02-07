@@ -15,7 +15,7 @@ public class ResponseHub {
   static {
     response.put("status", "Unauthorized");
     response.put("message", "You do not have the correct privileges to access this feature");
-    unAuthorizedResponse = new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    unAuthorizedResponse = new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   public static ResponseEntity<?> defaultUnauthorizedResponse() {
@@ -28,7 +28,7 @@ public class ResponseHub {
           put("status", "Deleted");
           put("message", "Entity successfully deleted");
         }},
-        HttpStatus.ACCEPTED);
+        HttpStatus.OK);
   }
 
   public static <T> ResponseEntity<?> defaultCreated(T t) {
@@ -55,7 +55,7 @@ public class ResponseHub {
           put("status", "Bad Request");
           put("message", "The password you entered was wrong");
         }},
-        HttpStatus.BAD_REQUEST);
+        HttpStatus.OK);
   }
 
   public static ResponseEntity<?> defaultBadRequest() {

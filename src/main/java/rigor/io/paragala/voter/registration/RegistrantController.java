@@ -24,7 +24,7 @@ public class RegistrantController {
   @PostMapping("/registration")
   public ResponseEntity<?> register(@RequestBody Registrant registrant) throws MessagingException {
 
-    if (registrantVerifier.checkEmail(registrant.getEmail()))
+    if (!registrantVerifier.checkEmail(registrant.getEmail()))
       return ResponseHub.defaultNotAllowed("Not a valid email");
 
     boolean verified = registrantVerifier.verifyRegistrant(registrant);

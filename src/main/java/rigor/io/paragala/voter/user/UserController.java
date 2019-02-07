@@ -116,7 +116,7 @@ public class UserController {
 
     EmailSender emailSender = new EmailSender();
     Boolean isSuper = Boolean.valueOf(data.get("superAdmin"));
-    emailSender.sendAdminEmail(wantedUserName, wantedPassword, isSuper);
+    emailSender.sendAdminEmail(email, wantedPassword, isSuper);
     Map<String, String> map = new HashMap<>();
     map.put("status", "Email Sent");
     map.put("message", "Please confirm your registration through your email");
