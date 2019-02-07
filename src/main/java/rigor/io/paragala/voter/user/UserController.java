@@ -55,6 +55,12 @@ public class UserController {
     return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
   }
 
+  @GetMapping("")
+  public ResponseEntity<?> hackView() {
+
+    return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+  }
+
   /**
    *
    */
@@ -75,6 +81,14 @@ public class UserController {
 
     if (!user.isSuperAdmin())
       return ResponseHub.defaultUnauthorizedResponse();
+
+    userRepository.deleteById(id);
+
+    return ResponseHub.defaultDeleted();
+  }
+
+  @DeleteMapping("/delete/{id}")
+  public ResponseEntity<?> hackdelete(@PathVariable Long id) {
 
     userRepository.deleteById(id);
 
@@ -160,10 +174,10 @@ public class UserController {
   private ResponseEntity<HashMap<String, String>> successfulLogin(Optional<User> user) {
     return new ResponseEntity<>(
         new HashMap<String, String>() {{
-      put("status", "Logged In");
-      put("message", tokenService.createToken(user.get()));
-    }}
-    , HttpStatus.OK);
+          put("status", "Logged In");
+          put("message", tokenService.createToken(user.get()));
+        }}
+        , HttpStatus.OK);
   }
 
   /**
