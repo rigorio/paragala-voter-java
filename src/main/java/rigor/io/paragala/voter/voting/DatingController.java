@@ -24,12 +24,14 @@ public class DatingController {
 
   @GetMapping("/start")
   public ResponseEntity<?> getStart() {
-    return new ResponseEntity<>(datingService.getStartDateTime(), HttpStatus.OK);
+    String startDateTime = datingService.getStartDateTime();
+    return new ResponseEntity<>(createMap(startDateTime), HttpStatus.OK);
   }
 
   @GetMapping("/end")
   public ResponseEntity<?> getEnd() {
-    return new ResponseEntity<>(datingService.getEndDateTime(), HttpStatus.OK);
+    String endDateTime = datingService.getEndDateTime();
+    return new ResponseEntity<>(createMap(endDateTime), HttpStatus.OK);
   }
 
   @PostMapping("")
@@ -46,6 +48,13 @@ public class DatingController {
       put("status", "Success");
       put("message", "I'm tired");
     }}, HttpStatus.OK);
+  }
+
+  public HashMap<String, String> createMap(String message) {
+    return new HashMap<String, String>(){{
+      put("status", "Success");
+      put("message", message);
+    }};
   }
 
 }

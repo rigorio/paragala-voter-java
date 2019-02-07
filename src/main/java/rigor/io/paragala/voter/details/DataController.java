@@ -3,6 +3,8 @@ package rigor.io.paragala.voter.details;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,8 @@ import rigor.io.paragala.voter.nominees.NomineeRepository;
 import rigor.io.paragala.voter.token.TokenService;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -201,22 +205,27 @@ public class DataController {
   }
 
   @GetMapping("/defaults/schools")
-  public ResponseEntity<?> defaultSchools(@RequestParam(required = false) String token) {
+  public ResponseEntity<?> defaultSchools(@RequestParam(required = false) String token) throws FileNotFoundException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    List<School> list = new ArrayList() {{
-      add(new School("Holy Angel University"));
-      add(new School("Mabalacat City College"));
-      add(new School("Tarlac State Univesity"));
-    }};
+    List<School> list = new ArrayList<>();
     schoolRepository.deleteAll();
+
+    CsvParserSettings settings = new CsvParserSettings();
+    settings.getFormat().setLineSeparator("\n");
+    CsvParser csvParser = new CsvParser(settings);
+    File file = new File("src/main/resources/schools.csv");
+
+    List<String[]> strings = csvParser.parseAll(new FileInputStream(file));
+    for (String[] string : strings) {
+      String name = string[0];
+      list.add(new School(name));
+    }
+
+    String[] schools = list.stream().map(School::getName).collect(Collectors.toList()).toArray(new String[0]);
     schoolRepository.saveAll(list);
-    String[] schools = list
-        .stream()
-        .map(School::getName)
-        .collect(Collectors.toList())
-        .toArray(new String[list.size()]);
+
     return ResponseHub.defaultCreated(schools);
   }
 

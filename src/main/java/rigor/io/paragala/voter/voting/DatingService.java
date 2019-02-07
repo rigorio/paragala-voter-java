@@ -2,6 +2,7 @@ package rigor.io.paragala.voter.voting;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -10,17 +11,17 @@ import java.time.LocalDateTime;
 @Service
 public class DatingService {
 
-  private LocalDateTime start;
-  private LocalDateTime end;
+  private LocalDate start;
+  private LocalDate end;
 
   public DatingService() {
-    start = LocalDateTime.parse("2018-01-01T00:00"); // default values
-    end = LocalDateTime.parse("2099-12-22T23:00");
+    start = LocalDate.parse("2018-01-01"); // default values
+    end = LocalDate.parse("2099-12-22");
   }
 
   public void setStartEnd(String s, String e){
-    start = LocalDateTime.parse(s.replace("Z", "")); // for some reason, there was a letter z
-    end = LocalDateTime.parse(e.replace("Z", ""));   // idk why
+    start = LocalDate.parse(s); // for some reason, there was a letter z
+    end = LocalDate.parse(e);   // idk why
   }
 
   public String getStartDateTime() {
@@ -32,17 +33,17 @@ public class DatingService {
   }
 
   public boolean isAllowed() {
-    LocalDateTime now = LocalDateTime.now();
+    LocalDate now = LocalDate.now();
     return now.isAfter(start) && now.isBefore(end);
   }
 
   public String setStart(String time) {
-    start = LocalDateTime.parse(time);
+    start = LocalDate.parse(time);
     return time;
   }
 
   public String setEnd(String time) {
-    end = LocalDateTime.parse(time);
+    end = LocalDate.parse(time);
     return time;
   }
 }
