@@ -82,7 +82,7 @@ public class ResponseHub {
           put("status", "Not allowed");
           put("message", message);
         }},
-        HttpStatus.FORBIDDEN);
+        HttpStatus.OK);
   }
 
   public static ResponseEntity<?> notAllowedToDate(DatingService datingService) {

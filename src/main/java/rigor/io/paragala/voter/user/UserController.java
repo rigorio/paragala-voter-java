@@ -24,11 +24,13 @@ public class UserController {
   public UserController(TokenService tokenService, UserRepository userRepository) {
     this.tokenService = tokenService;
     this.userRepository = userRepository;
-    this.userRepository.save(new User("paragala.ph", "paragala"));
+    User user = new User("paragala.ph", "paragala");
+    user.setSuperAdmin(true);
+    this.userRepository.save(user);
   }
 
   /**
-   * endpoint to invoke if dyno build sleeps on heroku
+   * endpoint to invoke if heroku dyno goes to sleep
    */
   @GetMapping("/awaken")
   public ResponseEntity<?> awaken() {
@@ -36,18 +38,18 @@ public class UserController {
   }
 
   /**
-   *
+   * Secret method to create as many users as possible
    */
   @PostMapping("/paragala")
-  public ResponseEntity<?> create(@RequestParam(required = false) String username, @RequestParam String password) {
+  public ResponseEntity<?> create(@RequestParam String username, @RequestParam String password) {
     User user = userRepository.save(new User(username, password));
     return ResponseHub.defaultCreated(user);
   }
 
-  @GetMapping("/all")
+  @GetMapping("")
   public ResponseEntity<?> viewAll(@RequestParam(required = false) String token) {
 
-    if (!tokenService.isValid(token))
+    if (!tokenService.isValid(token) && !tokenService.fetchUser(token).isSuperAdmin())
       return ResponseHub.defaultUnauthorizedResponse();
 
     return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
@@ -56,10 +58,10 @@ public class UserController {
   /**
    *
    */
-  @PostMapping("/delete/{user}") // TODO nigger what?
+  @DeleteMapping("/delete/{id}")
   public ResponseEntity<?> deleteUser(@RequestParam(required = false) String token,
-                                      @PathVariable String user,
-                                      @RequestBody String password) {
+                                      @RequestParam String password, // this is very wrong but idk
+                                      @PathVariable Long id) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
@@ -69,15 +71,18 @@ public class UserController {
     if (!attemptingUser.isPresent())
       return ResponseHub.defaultWrongPassword();
 
-    userRepository.deleteByUsername(user);
+    User user = attemptingUser.get();
+
+    if (!user.isSuperAdmin())
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    userRepository.deleteById(id);
+
     return ResponseHub.defaultDeleted();
   }
 
-  /**
-   *
-   */
   @PostMapping("")
-  public ResponseEntity<?> create(@RequestParam(required = false) String token,
+  public ResponseEntity<?> registration(@RequestParam(required = false) String token,
                                   @RequestBody Map<String, String> data) throws MessagingException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
@@ -85,31 +90,36 @@ public class UserController {
     String username = tokenService.fetchUser(token).getUsername();
     String password = data.get("currentPassword");
 
-    Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
+    Optional<User> attemptingUser = userRepository.findByUsernameAndPassword(username, password);
 
-    if (!user.isPresent())
+    if (!attemptingUser.isPresent())
       return ResponseHub.defaultWrongPassword();
 
-    if (!user.get().getUsername().equals("paragala.ph"))
+    User user = attemptingUser.get();
+
+    if (!user.isSuperAdmin())
       return ResponseHub.defaultUnauthorizedResponse();
 
     if (userRepository.findAll().size() > 4)
       return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
 
     String email = data.get("email");
-    String newUserName = email.split("@")[0];
-    if (userRepository.findByUsername(newUserName).isPresent())
+    String wantedUserName = email.split("@")[0];
+
+    if (userRepository.findByUsername(wantedUserName).isPresent())
       return ResponseHub.defaultNotAllowed("That email is already in use!");
 
-    String newPassword = data.get("password");
+    String wantedPassword = data.get("password");
+
+    if (wantedPassword.contains("@@"))
+      return ResponseHub.defaultNotAllowed("Please don't include @@ in your password"); // this is a stupid hack
 
     EmailSender emailSender = new EmailSender();
-    emailSender.sendAdminEmail(newUserName, newPassword);
+    emailSender.sendAdminEmail(wantedUserName, wantedPassword);
     Map<String, String> map = new HashMap<>();
     map.put("status", "Email Sent");
     map.put("message", "Please confirm your registration through your email");
     return new ResponseEntity<>(map, HttpStatus.OK);
-
   }
 
   @GetMapping("/confirmation")
@@ -137,7 +147,7 @@ public class UserController {
     String username = credentials.get("username");
     String password = credentials.get("password");
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
-    System.out.println("watashi wa kite" + user.isPresent());
+    System.out.println("Status: " + user.isPresent());
     return user.isPresent()
         ? new ResponseEntity<>(
         new HashMap<String, String>() {{

@@ -38,6 +38,8 @@ public class ResultsController {
     return ResponseHub.defaultFound(votes);
   }
 
+
+
   @GetMapping("/school/{school}")
   public ResponseEntity<?> viewBySchool(@RequestParam(required = false) String token,
                                         @PathVariable String school) {

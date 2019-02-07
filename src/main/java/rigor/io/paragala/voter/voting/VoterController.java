@@ -90,6 +90,12 @@ public class VoterController {
     return ResponseHub.defaultDeleted();
   }
 
+  /**
+   * actual voting
+   * @param data the request
+   * @return
+   * @throws IOException
+   */
   @PostMapping("/vote")
   public ResponseEntity<?> vote(@RequestBody Map<String, Object> data) throws IOException {
 

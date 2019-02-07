@@ -6,6 +6,8 @@ import rigor.io.paragala.voter.voting.Voter;
 import rigor.io.paragala.voter.voting.VoterRepository;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -16,6 +18,16 @@ public class RegistrantVerifier {
 
   public RegistrantVerifier(VoterRepository voterRepository) {
     this.voterRepository = voterRepository;
+  }
+
+  public boolean checkEmail(String email) {
+    try {
+      InternetAddress internetAddress = new InternetAddress(email);
+      internetAddress.validate();
+      return true;
+    } catch (AddressException e) {
+      return false;
+    }
   }
 
   public boolean verifyRegistrant(Registrant registrant) {

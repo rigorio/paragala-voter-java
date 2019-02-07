@@ -14,13 +14,13 @@ public class DatingService {
   private LocalDateTime end;
 
   public DatingService() {
-    start = LocalDateTime.parse("2018-01-01T00:00");
+    start = LocalDateTime.parse("2018-01-01T00:00"); // default values
     end = LocalDateTime.parse("2099-12-22T23:00");
   }
 
   public void setStartEnd(String s, String e){
-    start = LocalDateTime.parse(s.replace("Z", ""));
-    end = LocalDateTime.parse(e.replace("Z", ""));
+    start = LocalDateTime.parse(s.replace("Z", "")); // for some reason, there was a letter z
+    end = LocalDateTime.parse(e.replace("Z", ""));   // idk why
   }
 
   public String getStartDateTime() {

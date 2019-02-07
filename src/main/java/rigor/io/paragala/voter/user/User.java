@@ -20,6 +20,7 @@ public class User {
   private String username;
   @Getter(AccessLevel.NONE)
   private String password;
+  private boolean superAdmin;
 
   public User(String username, String password) {
     this.username = username;

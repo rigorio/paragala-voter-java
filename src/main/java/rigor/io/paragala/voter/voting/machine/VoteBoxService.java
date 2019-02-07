@@ -11,6 +11,11 @@ import rigor.io.paragala.voter.voting.VoterRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * HACKER MAN
+ * every thing here is illegal
+ * please don't be like me
+ */
 @Service
 public class VoteBoxService {
 

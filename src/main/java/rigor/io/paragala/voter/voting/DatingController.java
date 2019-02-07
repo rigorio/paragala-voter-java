@@ -23,18 +23,18 @@ public class DatingController {
   }
 
   @GetMapping("/start")
-  public ResponseEntity<?> getStart(@RequestParam(required = false) String token){
+  public ResponseEntity<?> getStart() {
     return new ResponseEntity<>(datingService.getStartDateTime(), HttpStatus.OK);
   }
 
   @GetMapping("/end")
-  public ResponseEntity<?> getEnd(@RequestParam(required = false) String token) {
+  public ResponseEntity<?> getEnd() {
     return new ResponseEntity<>(datingService.getEndDateTime(), HttpStatus.OK);
   }
 
   @PostMapping("")
-  public ResponseEntity<?> setStart(@RequestParam(required = false) String token,
-                                    @RequestBody Map<String, Object> data) {
+  public ResponseEntity<?> setDate(@RequestParam(required = false) String token,
+                                   @RequestBody Map<String, Object> data) {
 
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
@@ -42,7 +42,7 @@ public class DatingController {
     String startTime = String.valueOf(data.get("start"));
     String endTime = String.valueOf(data.get("end"));
     datingService.setStartEnd(startTime, endTime);
-    return new ResponseEntity<>(new HashMap<String, String>(){{
+    return new ResponseEntity<>(new HashMap<String, String>() {{
       put("status", "Success");
       put("message", "I'm tired");
     }}, HttpStatus.OK);
