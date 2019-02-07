@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class EmailSender {
 
-  private String host = "https://murmuring-earth-96219.herokuapp.com";
+  private String host = "https://shrouded-caverns-92003.herokuapp.com";
 
   private String username = "paragala.ph@gmail.com";
   private String password = "p4r4g4l4";
@@ -77,4 +77,18 @@ public class EmailSender {
     return props;
   }
 
+  public void sendAdminEmail(String wantedUserName, String wantedPassword, Boolean isSuper) throws MessagingException {
+
+    message.setRecipients(
+        Message.RecipientType.TO, InternetAddress.parse(wantedUserName));
+    MimeBodyPart mimeBodyPart = new MimeBodyPart();
+
+
+    message.setSubject("Account confirmation");
+    String code = new String(Base64.getEncoder().withoutPadding()
+                                 .encode((wantedUserName + "@@" + wantedPassword + "@@" + isSuper).getBytes()));
+    String link = host + "/api/users/confirmation?code=" + code;
+    String msg = "Please click the link to confirm your registration: " + link;
+    sendMessage(mimeBodyPart, msg);
+  }
 }

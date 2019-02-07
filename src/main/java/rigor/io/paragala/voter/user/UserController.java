@@ -115,7 +115,8 @@ public class UserController {
       return ResponseHub.defaultNotAllowed("Please don't include @@ in your password"); // this is a stupid hack
 
     EmailSender emailSender = new EmailSender();
-    emailSender.sendAdminEmail(wantedUserName, wantedPassword);
+    Boolean isSuper = Boolean.valueOf(data.get("superAdmin"));
+    emailSender.sendAdminEmail(wantedUserName, wantedPassword, isSuper);
     Map<String, String> map = new HashMap<>();
     map.put("status", "Email Sent");
     map.put("message", "Please confirm your registration through your email");
@@ -128,8 +129,11 @@ public class UserController {
     String[] confCode = new String(Base64.getDecoder().decode(code)).split("@@");
     String username = confCode[0];
     String password = confCode[1];
+    boolean isSuper = Boolean.parseBoolean(confCode[2]);
 
-    userRepository.save(new User(username, password));
+    User user = new User(username, password);
+    user.setSuperAdmin(isSuper);
+    userRepository.save(user);
     Map<String, String> map = new HashMap<>();
     map.put("status", "Success");
     map.put("message", "Account Created");
