@@ -159,9 +159,7 @@ public class DataController {
                                           @RequestPart(name = "file") MultipartFile file) throws IOException {
 
 
-    CsvParserSettings settings = new CsvParserSettings();
-    settings.getFormat().setLineSeparator("\n");
-    CsvParser csvParser = new CsvParser(settings);
+    CsvParser csvParser = getCsvParser();
 
     List<String[]> strings = csvParser.parseAll(file.getInputStream());
 
@@ -172,9 +170,58 @@ public class DataController {
 
     List<Nominee> createdNominees = nomineeRepository.saveAll(nominees);
     createdNominees.forEach(System.out::println);
-    return ResponseHub.defaultCreated(nomineeRepository.findAll());
+    return ResponseHub.defaultCreated(createdNominees);
   }
 
+  private CsvParser getCsvParser() {
+    CsvParserSettings settings = new CsvParserSettings();
+    settings.getFormat().setLineSeparator("\n");
+    return new CsvParser(settings);
+  }
+
+  @PostMapping("/schools/upload")
+  public ResponseEntity<?> uploadSchools(@RequestParam(required = false) String token,
+                                         @RequestPart(name = "file") MultipartFile file) throws IOException {
+
+
+    CsvParser csvParser = getCsvParser();
+
+    List<String[]> strings = csvParser.parseAll(file.getInputStream());
+
+    List<School> schools = new ArrayList<>();
+    strings.forEach(string -> {
+      schools.add(new School(string[0]));
+    });
+
+    List<School> createdSchools = schoolRepository.saveAll(schools);
+    createdSchools.forEach(System.out::println);
+    String[] s = createdSchools.stream().map(School::getName).collect(Collectors.toList()).toArray(new String[0]);
+    return ResponseHub.defaultCreated(s);
+  }
+
+  @PostMapping("/categories/upload")
+  public ResponseEntity<?> uploadCategories(@RequestParam(required = false) String token,
+                                         @RequestPart(name = "file") MultipartFile file) throws IOException {
+
+
+    CsvParser csvParser = getCsvParser();
+
+    List<String[]> strings = csvParser.parseAll(file.getInputStream());
+
+    List<Category> categories = new ArrayList<>();
+    strings.forEach(string -> {
+      categories.add(new Category(string[0]));
+    });
+
+    List<Category> createdCategories = categoryRepository.saveAll(categories);
+    createdCategories.forEach(System.out::println);
+    String[] c = createdCategories
+        .stream()
+        .map(Category::getKategory)
+        .collect(Collectors.toList())
+        .toArray(new String[createdCategories.size()]);
+    return ResponseHub.defaultCreated(c);
+  }
 
   /**
    *
@@ -235,9 +282,7 @@ public class DataController {
     List<School> list = new ArrayList<>();
     schoolRepository.deleteAll();
 
-    CsvParserSettings settings = new CsvParserSettings();
-    settings.getFormat().setLineSeparator("\n");
-    CsvParser csvParser = new CsvParser(settings);
+    CsvParser csvParser = getCsvParser();
     File file = new File("src/main/resources/schools.csv");
 
     List<String[]> strings = csvParser.parseAll(new FileInputStream(file));
