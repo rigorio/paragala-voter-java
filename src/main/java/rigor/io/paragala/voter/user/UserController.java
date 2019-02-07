@@ -83,7 +83,7 @@ public class UserController {
 
   @PostMapping("")
   public ResponseEntity<?> registration(@RequestParam(required = false) String token,
-                                  @RequestBody Map<String, String> data) throws MessagingException {
+                                        @RequestBody Map<String, String> data) throws MessagingException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
@@ -153,13 +153,17 @@ public class UserController {
     Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
     System.out.println("Status: " + user.isPresent());
     return user.isPresent()
-        ? new ResponseEntity<>(
-        new HashMap<String, String>() {{
-          put("status", "Logged In");
-          put("message", tokenService.createToken(user.get()));
-        }}
-        , HttpStatus.OK)
+        ? successfulLogin(user)
         : ResponseHub.badLogin();
+  }
+
+  private ResponseEntity<HashMap<String, String>> successfulLogin(Optional<User> user) {
+    return new ResponseEntity<>(
+        new HashMap<String, String>() {{
+      put("status", "Logged In");
+      put("message", tokenService.createToken(user.get()));
+    }}
+    , HttpStatus.OK);
   }
 
   /**
