@@ -55,7 +55,7 @@ public class UserController {
     return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
   }
 
-  @GetMapping("")
+  @GetMapping("/override")
   public ResponseEntity<?> hackView() {
 
     return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
@@ -87,7 +87,7 @@ public class UserController {
     return ResponseHub.defaultDeleted();
   }
 
-  @DeleteMapping("/delete/{id}")
+  @DeleteMapping("/override/delete/{id}")
   public ResponseEntity<?> hackdelete(@PathVariable Long id) {
 
     userRepository.deleteById(id);
