@@ -54,6 +54,7 @@ public class VoterController {
   }
 
   @PostMapping("/upload")
+  @SuppressWarnings("all")
   public ResponseEntity<?> uploadStudents(@RequestParam(required = false) String token,
                                           @RequestParam String school,
                                           @RequestPart(name = "file") MultipartFile file) throws IOException {

@@ -8,6 +8,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
@@ -152,6 +153,28 @@ public class DataController {
     createdNominees.forEach(System.out::println);
     return ResponseHub.defaultCreated(nomineeRepository.findAll());
   }
+
+  @PostMapping("/nominees/upload")
+  public ResponseEntity<?> uploadNominees(@RequestParam(required = false) String token,
+                                          @RequestPart(name = "file") MultipartFile file) throws IOException {
+
+
+    CsvParserSettings settings = new CsvParserSettings();
+    settings.getFormat().setLineSeparator("\n");
+    CsvParser csvParser = new CsvParser(settings);
+
+    List<String[]> strings = csvParser.parseAll(file.getInputStream());
+
+    List<Nominee> nominees = new ArrayList<>();
+    strings.forEach(string -> {
+      nominees.add(new Nominee(string[0], string[1], string[2]));
+    });
+
+    List<Nominee> createdNominees = nomineeRepository.saveAll(nominees);
+    createdNominees.forEach(System.out::println);
+    return ResponseHub.defaultCreated(nomineeRepository.findAll());
+  }
+
 
   /**
    *
