@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.nominees.Nominee;
+import rigor.io.paragala.voter.nominees.NomineeRepository;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.voting.machine.VoteBoxService;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -24,14 +26,25 @@ public class VoterController {
 
   private VoterRepository voterRepository;
   private TokenService tokenService;
+  private VoterCodeRepository voterCodeRepository;
+  private NomineeRepository nomineeRepository;
   private VoteBoxService voteBoxService;
   private DatingService datingService;
 
-  public VoterController(VoterRepository voterRepository, TokenService tokenService, VoteBoxService voteBoxService, DatingService datingService) {
+  public VoterController(VoterRepository voterRepository, TokenService tokenService,
+                         VoterCodeRepository voterCodeRepository, NomineeRepository nomineeRepository,
+                         VoteBoxService voteBoxService, DatingService datingService) {
     this.voterRepository = voterRepository;
     this.tokenService = tokenService;
+    this.voterCodeRepository = voterCodeRepository;
+    this.nomineeRepository = nomineeRepository;
     this.voteBoxService = voteBoxService;
     this.datingService = datingService;
+    this.voterCodeRepository.saveAll(new ArrayList<VoterCode>() {{
+      add(new VoterCode("a"));
+      add(new VoterCode("b"));
+      add(new VoterCode("c"));
+    }});
   }
 
   @GetMapping("")
@@ -91,8 +104,46 @@ public class VoterController {
     return ResponseHub.defaultDeleted();
   }
 
+
+  @PostMapping("/v2/vote")
+  public ResponseEntity<?> vote(@RequestBody Vote vote) {
+
+    if (!datingService.isAllowed())
+      return ResponseHub.notAllowedToDate(datingService);
+
+    String code = vote.getVoterCode();
+    Optional<VoterCode> byCode = voterCodeRepository.findByCode(code);
+    if (!byCode.isPresent()) {
+      return new ResponseEntity<>(new ResponseMessage("Not allowed", "The code you entered has either been used or does not exist."), HttpStatus.OK);
+    }
+    List<Long> votes = vote.getVotes();
+    voteBoxService.vote(votes);
+    voterCodeRepository.deleteVoterCodeByCode(code);
+    return new ResponseEntity<>(new ResponseMessage("Success", "Votes were tallied"), HttpStatus.OK);
+  }
+
+  @GetMapping("/v2/nominees")
+  public ResponseEntity<?> getNominees() {
+    return new ResponseEntity<>(new ResponseMessage("Success", nomineeRepository.findAll()), HttpStatus.OK);
+  }
+
+  @GetMapping("/voter-code/all")
+  public ResponseEntity<?> viewCodes() {
+    return new ResponseEntity<>(new ResponseMessage("Success", voterCodeRepository.findAll()), HttpStatus.OK);
+  }
+
+  @GetMapping("/voter-code/{number}")
+  public ResponseEntity<?> generateVoterCodes(@PathVariable int number) {
+
+    RandomStringGenerator rsg = new RandomStringGenerator();
+    List<VoterCode> codes = rsg.generateCodes(number).stream().map(VoterCode::new).collect(Collectors.toList());
+    List<VoterCode> savedCodes = voterCodeRepository.saveAll(codes);
+    return new ResponseEntity<>(new ResponseMessage("Success", savedCodes), HttpStatus.OK);
+  }
+
   /**
    * actual voting
+   *
    * @param data the request
    * @return
    * @throws IOException

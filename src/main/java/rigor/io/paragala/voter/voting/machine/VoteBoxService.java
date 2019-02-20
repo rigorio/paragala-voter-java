@@ -1,7 +1,6 @@
 package rigor.io.paragala.voter.voting.machine;
 
 import org.springframework.stereotype.Service;
-import rigor.io.paragala.voter.details.School;
 import rigor.io.paragala.voter.details.SchoolRepository;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
@@ -134,4 +133,16 @@ public class VoteBoxService {
   }
 
 
+  public void vote(List<Long> votes) {
+    for (Long id : votes) {
+      Optional<Nominee> byId = nomineeRepository.findById(id);
+      if (byId.isPresent()) {
+        Nominee nominee = byId.get();
+        nominee.setTally(nominee.getTally() + 1);
+        nomineeRepository.save(nominee);
+      }
+    }
+
+    nomineeRepository.findAll().forEach(System.out::println);
+  }
 }

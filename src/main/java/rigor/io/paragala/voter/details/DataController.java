@@ -13,6 +13,8 @@ import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
 import rigor.io.paragala.voter.token.TokenService;
+import rigor.io.paragala.voter.voting.DatingService;
+import rigor.io.paragala.voter.voting.ResponseMessage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +34,7 @@ public class DataController {
   private SchoolRepository schoolRepository;
   private CategoryRepository categoryRepository;
   private NomineeRepository nomineeRepository;
+  private DatingService datingService;
 
   private String[] titles = DataProvider.titles;
   private String[] companies = DataProvider.companies;
@@ -40,7 +43,10 @@ public class DataController {
   public DataController(TokenService tokenService,
                         SchoolRepository schoolRepository,
                         CategoryRepository categoryRepository,
+                        DatingService datingService,
                         NomineeRepository nomineeRepository) {
+
+    this.datingService = datingService;
     this.tokenService = tokenService;
     this.schoolRepository = schoolRepository;
     this.categoryRepository = categoryRepository;
@@ -71,6 +77,11 @@ public class DataController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing schools during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
+
     School savedSchool = schoolRepository.save(new School(school.get("school")));
     return ResponseHub.defaultCreated(savedSchool);
   }
@@ -83,6 +94,11 @@ public class DataController {
                                         @PathVariable String school) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
+
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing schools during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
 
     schoolRepository.deleteByName(school);
     return ResponseHub.defaultDeleted();
@@ -112,6 +128,11 @@ public class DataController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing categories during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
+
     Category savedCategory = categoryRepository.save(new Category(category.get("category")));
     return ResponseHub.defaultCreated(savedCategory);
   }
@@ -124,6 +145,11 @@ public class DataController {
                                           @PathVariable String category) {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
+
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing categories during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
 
     categoryRepository.deleteByKategory(category);
     return ResponseHub.defaultDeleted();
@@ -149,6 +175,11 @@ public class DataController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing nominees during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
+
     List<Nominee> createdNominees = nomineeRepository.saveAll(nominees);
     createdNominees.forEach(System.out::println);
     return ResponseHub.defaultCreated(nomineeRepository.findAll());
@@ -157,7 +188,13 @@ public class DataController {
   @PostMapping("/nominees/upload")
   public ResponseEntity<?> uploadNominees(@RequestParam(required = false) String token,
                                           @RequestPart(name = "file") MultipartFile file) throws IOException {
+    if (!tokenService.isValid(token))
+      return ResponseHub.defaultUnauthorizedResponse();
 
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing nominees during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
 
     CsvParser csvParser = getCsvParser();
 
@@ -179,6 +216,7 @@ public class DataController {
     return new CsvParser(settings);
   }
 
+  // TODO remove
   @PostMapping("/schools/upload")
   public ResponseEntity<?> uploadSchools(@RequestParam(required = false) String token,
                                          @RequestPart(name = "file") MultipartFile file) throws IOException {
@@ -201,7 +239,7 @@ public class DataController {
 
   @PostMapping("/categories/upload")
   public ResponseEntity<?> uploadCategories(@RequestParam(required = false) String token,
-                                         @RequestPart(name = "file") MultipartFile file) throws IOException {
+                                            @RequestPart(name = "file") MultipartFile file) throws IOException {
 
 
     CsvParser csvParser = getCsvParser();
@@ -232,6 +270,11 @@ public class DataController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing nominees during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
+
     nomineeRepository.deleteById(Long.parseLong(id));
     return ResponseHub.defaultDeleted();
   }
@@ -241,6 +284,11 @@ public class DataController {
   public ResponseEntity<?> defaultCategories(@RequestParam(required = false) String token) throws IOException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
+
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing categories during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
 
     List<Category> categories = new ArrayList<>();
     populate().forEach(nominee -> categories.add(new Category(nominee.getCategory())));
@@ -269,6 +317,24 @@ public class DataController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing nominees during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
+
+    nomineeRepository.deleteAll();
+    List<Nominee> nominees = nomineeRepository.saveAll(populate());
+    return ResponseHub.defaultCreated(nominees);
+  }
+
+  @GetMapping("/defaults/nominees/v2")
+  public ResponseEntity<?> defaultNominees() throws IOException {
+
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing nominees during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
+
     nomineeRepository.deleteAll();
     List<Nominee> nominees = nomineeRepository.saveAll(populate());
     return ResponseHub.defaultCreated(nominees);
@@ -278,6 +344,11 @@ public class DataController {
   public ResponseEntity<?> defaultSchools(@RequestParam(required = false) String token) throws FileNotFoundException {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
+
+    if (datingService.isAllowed()) {
+      String message = "You're not allowed to modify the existing nominees during the voting period.";
+      return new ResponseEntity<>(new ResponseMessage("Failed", message), HttpStatus.OK);
+    }
 
     List<School> list = new ArrayList<>();
     schoolRepository.deleteAll();

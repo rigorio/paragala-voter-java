@@ -34,6 +34,8 @@ public class DatingService {
 
   public boolean isAllowed() {
     LocalDate now = LocalDate.now();
+    LocalDate start = this.start;
+    LocalDate end = this.end;
     return now.isAfter(start) && now.isBefore(end);
   }
 
