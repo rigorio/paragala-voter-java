@@ -129,16 +129,17 @@ public class VoterController {
 
   @GetMapping("/voter-code/all")
   public ResponseEntity<?> viewCodes() {
-    return new ResponseEntity<>(new ResponseMessage("Success", voterCodeRepository.findAll()), HttpStatus.OK);
+    List<String> voterCodes = voterCodeRepository.findAll().stream().map(VoterCode::getCode).collect(Collectors.toList());
+    return new ResponseEntity<>(new ResponseMessage("Success", voterCodes), HttpStatus.OK);
   }
 
   @GetMapping("/voter-code/{number}")
   public ResponseEntity<?> generateVoterCodes(@PathVariable int number) {
-
     RandomStringGenerator rsg = new RandomStringGenerator();
     List<VoterCode> codes = rsg.generateCodes(number).stream().map(VoterCode::new).collect(Collectors.toList());
     List<VoterCode> savedCodes = voterCodeRepository.saveAll(codes);
-    return new ResponseEntity<>(new ResponseMessage("Success", savedCodes), HttpStatus.OK);
+    List<String> voterCodes = savedCodes.stream().map(VoterCode::getCode).collect(Collectors.toList());
+    return new ResponseEntity<>(new ResponseMessage("Success", voterCodes), HttpStatus.OK);
   }
 
   /**

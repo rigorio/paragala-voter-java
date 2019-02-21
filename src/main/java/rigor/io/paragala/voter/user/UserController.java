@@ -6,12 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.verification.EmailSender;
+import rigor.io.paragala.voter.voting.ResponseMessage;
 
 import javax.mail.MessagingException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -27,6 +26,18 @@ public class UserController {
     User user = new User("paragala.ph", "paragala");
     user.setSuperAdmin(true);
     this.userRepository.save(user);
+  }
+
+  @GetMapping("/password/confirm")
+  public ResponseEntity<?> confirmPass(@RequestParam String token,
+                                       @RequestParam String password) {
+
+    Optional<User> byUsernameAndPassword = userRepository.findByUsernameAndPassword(tokenService.fetchUser(token).getUsername(), password);
+    if (!byUsernameAndPassword.isPresent())
+      return new ResponseEntity<>(new ResponseMessage("Failed", "Password incorrect"), HttpStatus.OK);
+
+    return new ResponseEntity<>(new ResponseMessage("Success", "Password correct"), HttpStatus.OK);
+
   }
 
   /**
@@ -52,19 +63,31 @@ public class UserController {
     if (!tokenService.isValid(token) && !tokenService.fetchUser(token).isSuperAdmin())
       return ResponseHub.defaultUnauthorizedResponse();
 
-    return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+    User u = tokenService.fetchUser(token);
+
+    List<User> users = userRepository.findAll().stream()
+        .filter(user -> !user.getId().equals(u.getId()))
+        .collect(Collectors.toList());
+    return new ResponseEntity<>(new ResponseMessage("Success", users), HttpStatus.OK);
   }
 
-  @GetMapping("/override")
-  public ResponseEntity<?> hackView() {
+  @PutMapping("")
+  public ResponseEntity<?> editUser(@RequestParam(required = false) String token,
+                                    @RequestBody List<User> users) {
 
-    return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+    if (!tokenService.isValid(token) && !tokenService.fetchUser(token).isSuperAdmin())
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    List<User> savedUsers = userRepository.saveAll(users);
+    System.out.println(savedUsers);
+
+    return new ResponseEntity<>(new ResponseMessage("Success", "Details were saved"), HttpStatus.OK);
   }
 
   /**
    *
    */
-  @DeleteMapping("/delete/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteUser(@RequestParam(required = false) String token,
                                       @RequestParam String password, // this is very wrong but idk
                                       @PathVariable Long id) {
@@ -72,6 +95,9 @@ public class UserController {
       return ResponseHub.defaultUnauthorizedResponse();
 
     User u = tokenService.fetchUser(token);
+    System.out.println(u);
+    System.out.println("ah");
+    System.out.println(password);
     Optional<User> attemptingUser = userRepository.findByUsernameAndPassword(u.getUsername(), password);
 
     if (!attemptingUser.isPresent())
@@ -80,20 +106,62 @@ public class UserController {
     User user = attemptingUser.get();
 
     if (!user.isSuperAdmin())
-      return ResponseHub.defaultUnauthorizedResponse();
+      return new ResponseEntity<>(new ResponseMessage("Failed", "You are not a superAdmin"), HttpStatus.OK);
 
     userRepository.deleteById(id);
 
-    return ResponseHub.defaultDeleted();
+    return new ResponseEntity<>(new ResponseMessage("Success", "User was deleted"), HttpStatus.OK);
   }
 
-  @DeleteMapping("/override/delete/{id}")
-  public ResponseEntity<?> hackdelete(@PathVariable Long id) {
+  @PostMapping("/password")
+  public ResponseEntity<?> changePassword(@RequestParam(required = false) String token,
+                                          @RequestBody Map<String, String> data) {
+    if (!tokenService.isValid(token))
+      return new ResponseEntity<>(new ResponseMessage("Failed", "Not Authorized"), HttpStatus.OK);
 
-    userRepository.deleteById(id);
 
-    return ResponseHub.defaultDeleted();
+    String oldPassword = data.get("oldPassword");
+    String newPassword = data.get("newPassword");
+
+    User user = tokenService.fetchUser(token);
+
+    Optional<User> u = userRepository.findByUsernameAndPassword(user.getUsername(), oldPassword);
+
+    if (!u.isPresent())
+      return new ResponseEntity<>(new ResponseMessage("Failed", "Wrong password"), HttpStatus.OK);
+
+    user.setPassword(newPassword);
+    User savedUser = userRepository.save(user);
+    System.out.println("Saved user " + savedUser);
+
+    return new ResponseEntity<>(new ResponseMessage("Success", "Password was changed"), HttpStatus.OK);
   }
+
+//  @GetMapping("/ah")
+//  public ResponseEntity<?> asdfasdf(@RequestParam String username, @RequestParam String password) {
+//
+//    userRepository.findByUsernameAndPassword()
+//
+//  }
+
+  @PostMapping("/password/forgot")
+  public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> data) throws MessagingException {
+
+    String email = data.get("email");
+
+    String username = email.split("@")[0];
+    Optional<User> u = userRepository.findByUsername(username);
+
+    if (!u.isPresent())
+      return new ResponseEntity<>(new ResponseMessage("Failed", "User was not found"), HttpStatus.OK);
+
+    // TODO
+    EmailSender emailSender = new EmailSender();
+
+
+    return new ResponseEntity<>(new ResponseMessage("Email sent!", "Please view your email to change your password"), HttpStatus.OK);
+  }
+
 
   @PostMapping("")
   public ResponseEntity<?> registration(@RequestParam(required = false) String token,
