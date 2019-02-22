@@ -29,18 +29,20 @@ public class EmailSender {
     message.setFrom(new InternetAddress("paragala.ph@gmail.com"));
   }
 
-  public void sendNormalMail(String email, String message) throws MessagingException {
-    this.message.setRecipients(
+  public void sendNormalMail(String email) throws MessagingException {
+    message.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(email));
     MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
-    this.message.setSubject("Change password");
+    message.setSubject("Change password");
 
     String username = email.split("@")[0];
     String code = new String(Base64.getEncoder().withoutPadding()
                                  .encode(username.getBytes()));
 
-//    String link = host + "/api/account/"
+    String link = host + "/password/reset?code=" + code;
+    String msg = "Please click on the following link to reset your password: " + link;
+    sendMessage(mimeBodyPart, msg);
 
   }
 

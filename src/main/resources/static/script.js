@@ -43,10 +43,11 @@ function submitPassword() {
         console.log('This always runs...');
     };
     console.log(username + ":" + password1 + ":" + password2);
-// Create and send a GET request
-// The first argument is the post type (GET, POST, PUT, DELETE, etc.)
-// The second argument is the endpoint URL
-    var url = 'http://localhost:8080/api/users/password/forgot/reset?username='+username+'&password='+password1;
+
+    // var host = 'http://localhost:8080';
+    var host = 'https://shrouded-caverns-9.' +
+        '2003.herokuapp.com';
+    var url = host + '/api/users/password/forgot/reset?username='+username+'&password='+password1;
     console.log(url);
     xhr.open('GET', url);
     xhr.send();
