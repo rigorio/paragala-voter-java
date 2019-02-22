@@ -26,7 +26,7 @@ public class ResponseHub {
     return new ResponseEntity<>(
         new HashMap<String, String>() {{
           put("status", "Deleted");
-          put("message", "Entity successfully deleted");
+          put("message", "Successfully deleted");
         }},
         HttpStatus.OK);
   }

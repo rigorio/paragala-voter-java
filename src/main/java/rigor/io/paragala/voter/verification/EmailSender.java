@@ -5,6 +5,7 @@ import javax.mail.internet.*;
 import java.util.Base64;
 import java.util.Properties;
 
+@SuppressWarnings("all")
 public class EmailSender {
 
   private String host = "https://shrouded-caverns-92003.herokuapp.com";
@@ -26,6 +27,21 @@ public class EmailSender {
     });
     message = new MimeMessage(session);
     message.setFrom(new InternetAddress("paragala.ph@gmail.com"));
+  }
+
+  public void sendNormalMail(String email, String message) throws MessagingException {
+    this.message.setRecipients(
+        Message.RecipientType.TO, InternetAddress.parse(email));
+    MimeBodyPart mimeBodyPart = new MimeBodyPart();
+
+    this.message.setSubject("Change password");
+
+    String username = email.split("@")[0];
+    String code = new String(Base64.getEncoder().withoutPadding()
+                                 .encode(username.getBytes()));
+
+//    String link = host + "/api/account/"
+
   }
 
   public void sendMail(String email, String voterCode) throws MessagingException {
