@@ -40,11 +40,6 @@ public class VoterController {
     this.nomineeRepository = nomineeRepository;
     this.voteBoxService = voteBoxService;
     this.datingService = datingService;
-    this.voterCodeRepository.saveAll(new ArrayList<VoterCode>() {{
-      add(new VoterCode("a"));
-      add(new VoterCode("b"));
-      add(new VoterCode("c"));
-    }});
   }
 
   @GetMapping("")
