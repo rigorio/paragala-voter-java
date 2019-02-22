@@ -24,9 +24,7 @@ public class DatingService {
   }
 
   public boolean checkDates(String s, String e) {
-    start = LocalDate.parse(s); // for some reason, there was a letter z
-    end = LocalDate.parse(e);   // idk why
-    return end.isBefore(start);
+    return LocalDate.parse(e).isBefore(LocalDate.parse(s));
   }
 
   public String getStartDateTime() {

@@ -45,14 +45,16 @@ public class DatingController {
     String endTime = String.valueOf(data.get("end"));
 
 
-    if (datingService.checkDates(startTime, endTime))
+    boolean b = datingService.checkDates(startTime, endTime);
+    System.out.println(startTime + ":" + endTime + " is " + b);
+    if (b)
       return new ResponseEntity<>(new ResponseMessage("Failed", "End date cannot be before start date"), HttpStatus.OK);
 
 
-      datingService.setStartEnd(startTime, endTime);
+    datingService.setStartEnd(startTime, endTime);
     return new ResponseEntity<>(new HashMap<String, String>() {{
       put("status", "Success");
-      put("message", "I'm tired");
+      put("message", "Voting period was changed");
     }}, HttpStatus.OK);
   }
 
