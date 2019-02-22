@@ -14,8 +14,8 @@ public class DatingService {
   private LocalDate end;
 
   public DatingService() {
-    start = LocalDate.parse("2018-01-01"); // default values
-    end = LocalDate.parse("2018-03-22");
+    start = LocalDate.parse("2019-03-01"); // default values
+    end = LocalDate.parse("2019-03-22");
   }
 
   public void setStartEnd(String s, String e) {

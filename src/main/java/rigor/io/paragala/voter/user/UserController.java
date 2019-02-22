@@ -7,6 +7,7 @@ import rigor.io.paragala.voter.ResponseHub;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.verification.EmailSender;
 import rigor.io.paragala.voter.voting.ResponseMessage;
+import rigor.io.paragala.voter.voting.password.PasswordTokenService;
 
 import javax.mail.MessagingException;
 import java.util.*;
@@ -19,10 +20,12 @@ public class UserController {
 
   private TokenService tokenService;
   private UserRepository userRepository;
+  private PasswordTokenService passwordTokenService;
 
-  public UserController(TokenService tokenService, UserRepository userRepository) {
+  public UserController(TokenService tokenService, UserRepository userRepository, PasswordTokenService passwordTokenService) {
     this.tokenService = tokenService;
     this.userRepository = userRepository;
+    this.passwordTokenService = passwordTokenService;
     User user = new User("paragala.ph", "paragala");
     user.setSuperAdmin(true);
     this.userRepository.save(user);
@@ -113,6 +116,13 @@ public class UserController {
     return new ResponseEntity<>(new ResponseMessage("Success", "User was deleted"), HttpStatus.OK);
   }
 
+  /**
+   * For changing password
+   *
+   * @param token
+   * @param data
+   * @return
+   */
   @PostMapping("/password")
   public ResponseEntity<?> changePassword(@RequestParam(required = false) String token,
                                           @RequestBody Map<String, String> data) {
@@ -137,13 +147,8 @@ public class UserController {
     return new ResponseEntity<>(new ResponseMessage("Success", "Password was changed"), HttpStatus.OK);
   }
 
-//  @GetMapping("/ah")
-//  public ResponseEntity<?> asdfasdf(@RequestParam String username, @RequestParam String password) {
-//
-//    userRepository.findByUsernameAndPassword()
-//
-//  }
 
+  // TODO
   @PostMapping("/password/forgot")
   public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> data) throws MessagingException {
 
@@ -156,10 +161,34 @@ public class UserController {
       return new ResponseEntity<>(new ResponseMessage("Failed", "User was not found"), HttpStatus.OK);
 
     // TODO
+
+    passwordTokenService.addUser(username);
+
     EmailSender emailSender = new EmailSender();
 
 
     return new ResponseEntity<>(new ResponseMessage("Email sent!", "Please view your email to change your password"), HttpStatus.OK);
+  }
+
+  @GetMapping("/password/forgot/reset")
+  public ResponseEntity<?> resetPassword(@RequestParam String username, @RequestParam String password) {
+
+    System.out.println(username + ":" + password);
+
+    if (!passwordTokenService.isValid(username))
+      return new ResponseEntity<>(new ResponseMessage("Failed", "Wrong username"), HttpStatus.OK);
+
+    Optional<User> byUsername = userRepository.findByUsername(username);
+    if (!byUsername.isPresent())
+      return new ResponseEntity<>(new ResponseMessage("Failed", "User not found"), HttpStatus.OK);
+
+    User user = byUsername.get();
+
+    user.setPassword(password);
+
+    passwordTokenService.delete(username);
+
+    return new ResponseEntity<>(new ResponseMessage("Success", "Password was successfully changed"), HttpStatus.OK);
   }
 
 
@@ -169,40 +198,7 @@ public class UserController {
     if (!tokenService.isValid(token))
       return ResponseHub.defaultUnauthorizedResponse();
 
-    String username = tokenService.fetchUser(token).getUsername();
-    String password = data.get("currentPassword");
-
-    Optional<User> attemptingUser = userRepository.findByUsernameAndPassword(username, password);
-
-    if (!attemptingUser.isPresent())
-      return ResponseHub.defaultWrongPassword();
-
-    User user = attemptingUser.get();
-
-    if (!user.isSuperAdmin())
-      return ResponseHub.defaultUnauthorizedResponse();
-
-    if (userRepository.findAll().size() > 4)
-      return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
-
-    String email = data.get("email");
-    String wantedUserName = email.split("@")[0];
-
-    if (userRepository.findByUsername(wantedUserName).isPresent())
-      return ResponseHub.defaultNotAllowed("That email is already in use!");
-
-    String wantedPassword = data.get("password");
-
-    if (wantedPassword.contains("@@"))
-      return ResponseHub.defaultNotAllowed("Please don't include @@ in your password"); // this is a stupid hack
-
-    EmailSender emailSender = new EmailSender();
-    Boolean isSuper = Boolean.valueOf(data.get("superAdmin"));
-    emailSender.sendAdminEmail(email, wantedPassword, isSuper);
-    Map<String, String> map = new HashMap<>();
-    map.put("status", "Email Sent");
-    map.put("message", "Please confirm your registration through your email");
-    return new ResponseEntity<>(map, HttpStatus.OK);
+    return registerUser(token, data);
   }
 
   @GetMapping("/confirmation")
@@ -239,15 +235,6 @@ public class UserController {
         : ResponseHub.badLogin();
   }
 
-  private ResponseEntity<HashMap<String, String>> successfulLogin(Optional<User> user) {
-    return new ResponseEntity<>(
-        new HashMap<String, String>() {{
-          put("status", "Logged In");
-          put("message", tokenService.createToken(user.get()));
-        }}
-        , HttpStatus.OK);
-  }
-
   /**
    *
    */
@@ -256,6 +243,15 @@ public class UserController {
     return tokenService.isValid(token)
         ? new ResponseEntity<>(logoutUser(token), HttpStatus.OK)
         : ResponseHub.defaultBadRequest();
+  }
+
+  private ResponseEntity<HashMap<String, String>> successfulLogin(Optional<User> user) {
+    return new ResponseEntity<>(
+        new HashMap<String, String>() {{
+          put("status", "Logged In");
+          put("message", tokenService.createToken(user.get()));
+        }}
+        , HttpStatus.OK);
   }
 
   private ResponseEntity<?> logoutUser(String token) {
@@ -267,4 +263,37 @@ public class UserController {
         }}, HttpStatus.OK);
   }
 
+  private ResponseEntity<?> registerUser(@RequestParam(required = false) String token, @RequestBody Map<String, String> data) throws MessagingException {
+    String username = tokenService.fetchUser(token).getUsername();
+    String password = data.get("currentPassword");
+
+    Optional<User> attemptingUser = userRepository.findByUsernameAndPassword(username, password);
+
+    if (!attemptingUser.isPresent())
+      return ResponseHub.defaultWrongPassword();
+
+    User user = attemptingUser.get();
+
+    if (!user.isSuperAdmin())
+      return ResponseHub.defaultUnauthorizedResponse();
+
+    if (userRepository.findAll().size() > 4)
+      return ResponseHub.defaultNotAllowed("Maximum limit for admins reached. Please delete an admin in order to create a new admin");
+
+    String email = data.get("email");
+    String wantedUserName = email.split("@")[0];
+
+    if (userRepository.findByUsername(wantedUserName).isPresent())
+      return ResponseHub.defaultNotAllowed("That email is already in use!");
+
+    String wantedPassword = data.get("password");
+
+    if (wantedPassword.contains("@@"))
+      return ResponseHub.defaultNotAllowed("Please don't include @@ in your password"); // this is a stupid hack
+
+    EmailSender emailSender = new EmailSender();
+    Boolean isSuper = Boolean.valueOf(data.get("superAdmin"));
+    emailSender.sendAdminEmail(email, wantedPassword, isSuper);
+    return new ResponseEntity<>(new ResponseMessage("Email Sent", "Please confirm your registration through your email"), HttpStatus.OK);
+  }
 }

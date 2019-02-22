@@ -1,4 +1,4 @@
-package rigor.io.paragala.voter.voting;
+package rigor.io.paragala.voter.voting.password;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 
 @Controller
+@CrossOrigin
 public class PasswordController {
 
   @GetMapping("")

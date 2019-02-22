@@ -14,6 +14,8 @@ import rigor.io.paragala.voter.nominees.Nominee;
 import rigor.io.paragala.voter.nominees.NomineeRepository;
 import rigor.io.paragala.voter.token.TokenService;
 import rigor.io.paragala.voter.voting.machine.VoteBoxService;
+import rigor.io.paragala.voter.voting.voterCode.VoterCode;
+import rigor.io.paragala.voter.voting.voterCode.VoterCodeRepository;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,6 +42,11 @@ public class VoterController {
     this.nomineeRepository = nomineeRepository;
     this.voteBoxService = voteBoxService;
     this.datingService = datingService;
+    this.voterCodeRepository.saveAll(new ArrayList<VoterCode>() {{
+      add(new VoterCode("a"));
+      add(new VoterCode("b"));
+      add(new VoterCode("c"));
+    }});
   }
 
   @GetMapping("")

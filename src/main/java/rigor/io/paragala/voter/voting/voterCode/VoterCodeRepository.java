@@ -1,4 +1,4 @@
-package rigor.io.paragala.voter.voting;
+package rigor.io.paragala.voter.voting.voterCode;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
