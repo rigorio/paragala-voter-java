@@ -43,7 +43,13 @@ public class DatingController {
 
     String startTime = String.valueOf(data.get("start"));
     String endTime = String.valueOf(data.get("end"));
-    datingService.setStartEnd(startTime, endTime);
+
+
+    if (datingService.checkDates(startTime, endTime))
+      return new ResponseEntity<>(new ResponseMessage("Failed", "End date cannot be before start date"), HttpStatus.OK);
+
+
+      datingService.setStartEnd(startTime, endTime);
     return new ResponseEntity<>(new HashMap<String, String>() {{
       put("status", "Success");
       put("message", "I'm tired");
@@ -51,7 +57,7 @@ public class DatingController {
   }
 
   public HashMap<String, String> createMap(String message) {
-    return new HashMap<String, String>(){{
+    return new HashMap<String, String>() {{
       put("status", "Success");
       put("message", message);
     }};

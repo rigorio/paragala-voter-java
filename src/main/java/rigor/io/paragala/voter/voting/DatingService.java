@@ -3,7 +3,6 @@ package rigor.io.paragala.voter.voting;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * please someone take me out on a date
@@ -19,9 +18,15 @@ public class DatingService {
     end = LocalDate.parse("2099-12-22");
   }
 
-  public void setStartEnd(String s, String e){
+  public void setStartEnd(String s, String e) {
     start = LocalDate.parse(s); // for some reason, there was a letter z
     end = LocalDate.parse(e);   // idk why
+  }
+
+  public boolean checkDates(String s, String e) {
+    start = LocalDate.parse(s); // for some reason, there was a letter z
+    end = LocalDate.parse(e);   // idk why
+    return end.isBefore(start);
   }
 
   public String getStartDateTime() {
@@ -36,6 +41,8 @@ public class DatingService {
     LocalDate now = LocalDate.now();
     LocalDate start = this.start;
     LocalDate end = this.end;
+    if (end.isBefore(start))
+      return false;
     return now.isAfter(start) && now.isBefore(end);
   }
 
