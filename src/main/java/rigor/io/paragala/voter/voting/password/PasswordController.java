@@ -13,7 +13,13 @@ import rigor.io.paragala.voter.voting.ResponseMessage;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
 import java.util.Base64;
+import java.util.Hashtable;
 import java.util.Optional;
 
 
@@ -34,7 +40,7 @@ public class PasswordController {
 
   @GetMapping("")
   @SuppressWarnings("all")
-  public ResponseEntity<?> requestChange(@RequestParam String email) throws MessagingException {
+  public ResponseEntity<?> requestChange(@RequestParam String email) throws MessagingException, NamingException {
     String username = email.split("@")[0];
     Optional<User> u = userRepository.findByUsername(username);
     if (!u.isPresent())
@@ -68,15 +74,26 @@ public class PasswordController {
     return new ResponseEntity<>(new ResponseMessage("Success", "Password was changed"), HttpStatus.OK);
   }
 
-  private boolean checkEmail(String email) {
-    try {
-      InternetAddress internetAddress = new InternetAddress(email);
-      internetAddress.validate();
-      return true;
-    } catch (AddressException e) {
-      return false;
+  private boolean checkEmail(String email) throws NamingException {
+    String[] strings = email.split("@");
+    String hostName = "";
+    if (strings.length > 1)
+      hostName = strings[0];
+    Hashtable env = new Hashtable();
+    env.put("java.naming.factory.initial",
+            "com.sun.jndi.dns.DnsContextFactory");
+    DirContext ictx = new InitialDirContext(env);
+    Attributes attrs = ictx.getAttributes
+        (hostName, new String[]{"MX"});
+    Attribute attr = attrs.get("MX");
+    if ((attr == null) || (attr.size() == 0)) {
+      attrs = ictx.getAttributes(hostName, new String[]{"A"});
+      attr = attrs.get("A");
+      return attr != null;
     }
+    return true;
   }
+
 
   @GetMapping("/password/reset")
   public String changePass(@RequestParam String code) {

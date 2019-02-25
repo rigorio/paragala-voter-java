@@ -27,6 +27,7 @@ public class UserController {
     this.userRepository = userRepository;
     this.passwordTokenService = passwordTokenService;
     User user = new User("paragala.ph", "paragala");
+    user.setEmail("paragala.ph@gmail.com");
     user.setSuperAdmin(true);
     this.userRepository.save(user);
   }
