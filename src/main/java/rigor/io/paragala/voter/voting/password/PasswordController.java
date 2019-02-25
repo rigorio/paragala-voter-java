@@ -94,21 +94,4 @@ public class PasswordController {
     return true;
   }
 
-
-  @GetMapping("/password/reset")
-  public String changePass(@RequestParam String code) {
-    String username;
-    try {
-      username = new String(Base64.getDecoder().decode(code));
-    } catch (IllegalArgumentException e) {
-      return "secret";
-    }
-    System.out.println("imasu ka? " + username);
-    if (!passwordTokenService.isValid(username))
-      return "secret";
-
-
-    return "/index.html";
-  }
-
 }
