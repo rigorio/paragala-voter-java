@@ -23,7 +23,7 @@ import java.util.Hashtable;
 import java.util.Optional;
 
 
-@Controller
+@RestController
 @CrossOrigin
 @RequestMapping("/api/password")
 public class PasswordController {
