@@ -16,9 +16,10 @@ import java.util.Properties;
 public class EmailTest {
 
   @Test
+  @SuppressWarnings("all")
   public void testMails() throws NamingException {
 
-    String hostName = "what";
+    String hostName = "";
     Hashtable env = new Hashtable();
     env.put("java.naming.factory.initial",
             "com.sun.jndi.dns.DnsContextFactory");
