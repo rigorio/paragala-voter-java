@@ -46,6 +46,17 @@ public class EmailSender {
 
   }
 
+  public void sendEmail(String email, String message) throws MessagingException {
+
+    this.message.setRecipients(
+        Message.RecipientType.TO, InternetAddress.parse(email));
+    MimeBodyPart mimeBodyPart = new MimeBodyPart();
+
+    this.message.setSubject("Change password");
+
+    sendMessage(mimeBodyPart, message);
+  }
+
   public void sendMail(String email, String voterCode) throws MessagingException {
     message.setRecipients(
         Message.RecipientType.TO, InternetAddress.parse(email));
