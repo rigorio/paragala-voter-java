@@ -74,24 +74,14 @@ public class PasswordController {
     return new ResponseEntity<>(new ResponseMessage("Success", "Password was changed"), HttpStatus.OK);
   }
 
-  private boolean checkEmail(String email) throws NamingException {
-    String[] strings = email.split("@");
-    String hostName = "";
-    if (strings.length > 1)
-      hostName = strings[0];
-    Hashtable env = new Hashtable();
-    env.put("java.naming.factory.initial",
-            "com.sun.jndi.dns.DnsContextFactory");
-    DirContext ictx = new InitialDirContext(env);
-    Attributes attrs = ictx.getAttributes
-        (hostName, new String[]{"MX"});
-    Attribute attr = attrs.get("MX");
-    if ((attr == null) || (attr.size() == 0)) {
-      attrs = ictx.getAttributes(hostName, new String[]{"A"});
-      attr = attrs.get("A");
-      return attr != null;
+  public boolean checkEmail(String email) {
+    try {
+      InternetAddress internetAddress = new InternetAddress(email);
+      internetAddress.validate();
+      return true;
+    } catch (AddressException e) {
+      return false;
     }
-    return true;
   }
 
 }
