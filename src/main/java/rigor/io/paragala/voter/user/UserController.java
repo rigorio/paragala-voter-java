@@ -32,6 +32,17 @@ public class UserController {
     this.userRepository.save(user);
   }
 
+  @GetMapping("/user")
+  public ResponseEntity<?> viewUser(@RequestParam String token) {
+    return new ResponseEntity<>(new ResponseMessage("Success", tokenService.fetchUser(token)), HttpStatus.OK);
+  }
+
+  @GetMapping("/isLoggedIn")
+  public ResponseEntity<?> isLoggedIn(@RequestParam String token) {
+    return new ResponseEntity<>(new ResponseMessage("Success", new HashMap<String, String>(){{
+      put("valid", String.valueOf(tokenService.isValid(token)));
+    }}), HttpStatus.OK);
+  }
 
   @GetMapping("/password/confirm")
   public ResponseEntity<?> confirmPass(@RequestParam String token,
