@@ -40,19 +40,7 @@ public class RegistrantController {
     return new ResponseEntity<>(map, HttpStatus.OK);
   }
 
-  @GetMapping("/confirmation")
-  public ResponseEntity<?> confirmRegistration(@RequestParam String code) {
-    boolean isConfirmed = registrantVerifier.confirmRegistration(code);
-    Map<String, String> map = new HashMap<>();
-    if (!isConfirmed){
-      map.put("status", "Bad request");
-      map.put("message", "There was a problem with your request. Contact your administrator for more details");
-      return new ResponseEntity<>(map, HttpStatus.OK);
-    }
-    map.put("status", "Account successfully created!");
-    map.put("message", "Please proceed to vote on the paragala app");
-    return new ResponseEntity<>(map, HttpStatus.OK);
-  }
+
 
 
 }

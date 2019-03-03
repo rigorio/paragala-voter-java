@@ -159,9 +159,16 @@ public class DataController {
    *
    */
   @GetMapping("/nominees")
-  public ResponseEntity<?> getNominees() {
+  public ResponseEntity<?> getNominees(@RequestParam(required = false) String category) {
 
     List<Nominee> nominees = nomineeRepository.findAll();
+
+    if (category != null) {
+      nominees = nominees.stream()
+          .filter(nominee -> nominee.getCategory().equals(category))
+          .collect(Collectors.toList());
+    }
+
     return ResponseHub.defaultFound(nominees);
   }
 

@@ -32,6 +32,7 @@ public class UserController {
     this.userRepository.save(user);
   }
 
+
   @GetMapping("/password/confirm")
   public ResponseEntity<?> confirmPass(@RequestParam String token,
                                        @RequestParam String password) {
@@ -200,23 +201,6 @@ public class UserController {
       return ResponseHub.defaultUnauthorizedResponse();
 
     return registerUser(token, data);
-  }
-
-  @GetMapping("/confirmation")
-  public ResponseEntity<?> confirmation(@RequestParam String code) {
-
-    String[] confCode = new String(Base64.getDecoder().decode(code)).split("@@");
-    String username = confCode[0];
-    String password = confCode[1];
-    boolean isSuper = Boolean.parseBoolean(confCode[2]);
-
-    User user = new User(username, password);
-    user.setSuperAdmin(isSuper);
-    userRepository.save(user);
-    Map<String, String> map = new HashMap<>();
-    map.put("status", "Success");
-    map.put("message", "Account Created");
-    return new ResponseEntity<>(map, HttpStatus.OK);
   }
 
   /**
